@@ -95,14 +95,16 @@ namespace FFAMod
             if (instance.players.Count == 4)
             {
                 array = new int[4] { 0, 1, 2, 3 };
-                return array[team + offset];
             }
             else if (instance.players.Count == 3)
             {
                 array = new int[3] { 0, 1, 2 };
-                return array[team + offset];
             }
-            return instance.GetOtherTeam(team);
+            else
+            {
+                array = new int[2] { 0, 1 };
+            }
+            return array[(team + offset) % array.Length];
         }
     }
 }

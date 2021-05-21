@@ -1,19 +1,10 @@
-﻿/*
-using Photon.Pun;
-using HarmonyLib;
+﻿using HarmonyLib;
 
 namespace FFAMod
 {
     [HarmonyPatch(typeof(PointVisualizer))]
-    internal partial class PointVisualizerPatch : PointVisualizer
+    internal class PointVisualizerPatch : PointVisualizer
     {
-        private static PointVisualizerPatch instancePatch;
-
-        private void Awake()
-        {
-            instancePatch = this;
-        }
-
         [HarmonyPatch("DoShowPoints")]
         private static void Postfix()
         {
@@ -21,43 +12,42 @@ namespace FFAMod
             {
                 if (GM_ArmsRacePatch.p3Points > 1)
                 {
-                    instancePatch.RoundRed();
+                    RoundRed();
                     return;
                 }
-                instancePatch.HalfRed();
+                HalfRed();
                 return;
             }
             else if (GM_ArmsRacePatch.winningTeamID == 3)
             {
                 if (GM_ArmsRacePatch.p4Points > 1)
                 {
-                    instancePatch.RoundYellow();
+                    RoundGreen();
                     return;
                 }
-                instancePatch.HalfYellow();
+                HalfGreen();
                 return;
             }
         }
 
-        private void HalfRed()
+        private static void HalfRed()
         {
-            text.text = "HALF RED";
+            instance.text.text = "HALF RED";
         }
 
-        private void RoundRed()
+        private static void RoundRed()
         {
-            text.text = "HALF RED";
+            instance.text.text = "ROUND RED";
         }
 
-        private void HalfYellow()
+        private static void HalfGreen()
         {
-            text.text = "HALF YELLOW";
+            instance.text.text = "HALF GREEN";
         }
 
-        private void RoundYellow()
+        private static void RoundGreen()
         {
-            text.text = "HALF YELLOW";
+            instance.text.text = "ROUND GREEN";
         }
     }
 }
-*/

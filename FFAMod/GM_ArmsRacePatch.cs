@@ -15,7 +15,7 @@ namespace FFAMod
         public static int p3Rounds;
         public static int p4Rounds;
 
-        private static int winningTeamID = -1;
+        public static int winningTeamID = -1;
         private static int losingTeamID = -1;
         private static int losingTeamID2 = -1;
         private static int losingTeamID3 = -1;
@@ -23,6 +23,14 @@ namespace FFAMod
         [HarmonyPatch("Start")]
         private static bool Prefix(ref int ___playersNeededToStart, ref PhotonView ___view)
         {
+            p3Points = 0;
+            p4Points = 0;
+            p3Rounds = 0;
+            p4Rounds = 0;
+            winningTeamID = -1;
+            losingTeamID = -1;
+            losingTeamID2 = -1;
+            losingTeamID3 = -1;
             var playerManager = PlayerManager.instance;
             var playerAssigner = PlayerAssigner.instance;
             var uiHandler = UIHandler.instance;
@@ -37,7 +45,7 @@ namespace FFAMod
             // playerManager.PlayerJoinedAction = (Action<Player>)Delegate.Combine(playerManager.PlayerJoinedAction, new Action<Player>(instance.PlayerJoined));
             Traverse.Create(playerManager).Property("PlayerJoinedAction").SetValue((Action<Player>)Delegate.Combine(playerManager.PlayerJoinedAction, new Action<Player>(instance.PlayerJoined)));
             ArtHandler.instance.NextArt();
-            ___playersNeededToStart = 4;
+            // ___playersNeededToStart = 4;
             Main.mod.Logger.Log("Players needed to start: " + ___playersNeededToStart);
             // UIHandler.instance.SetNumberOfRounds(instance.roundsToWinGame);
             AccessTools.Method(typeof(UIHandler), "SetNumberOfRounds").Invoke(uiHandler, new object[] { instance.roundsToWinGame });
@@ -78,19 +86,15 @@ namespace FFAMod
             TimeHandler.instance.DoSlowDown();
             if (!PhotonNetwork.IsMasterClient)
                 return false;
-            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManager.instance.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
+            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
             return false;
         }
 
         [HarmonyPatch("RPCA_NextRound")]
-        private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet)
+        private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning)
         {
-            GM_ArmsRacePatch.winningTeamID = winningTeamID;
-            Debug.Log("Winning team: " + winningTeamID);
             if (PlayerManager.instance.players.Count >= 3)
             {
-                losingTeamID = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive());
-                Debug.Log("Losing team: " + losingTeamID);
                 losingTeamID2 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 2);
                 Debug.Log("Losing team: " + losingTeamID2);
             }
@@ -101,15 +105,16 @@ namespace FFAMod
             }
             GM_ArmsRacePatch.losingTeamID = losingTeamID;
             Debug.Log("Losing team: " + losingTeamID);
-            var isTransitioning = AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning");
-            if ((bool)isTransitioning.GetValue(instance))
+            GM_ArmsRacePatch.winningTeamID = winningTeamID;
+            Debug.Log("Winning team: " + winningTeamID);
+            if (___isTransitioning)
                 return false;
             GameManager.instance.battleOngoing = false;
             instance.p1Points = p1PointsSet;
             instance.p2Points = p2PointsSet;
             instance.p1Rounds = p1RoundsSet;
             instance.p2Rounds = p2RoundsSet;
-            isTransitioning.SetValue(instance, true);
+            ___isTransitioning = true;
             GameManager.instance.GameOver(winningTeamID, losingTeamID);
             if (losingTeamID2 >= 0)
                 GameManager.instance.GameOver(winningTeamID, losingTeamID2);
@@ -175,10 +180,7 @@ namespace FFAMod
             GM_ArmsRace gmArmsRace = instance;
             var SetPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
             var WaitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
-            if (winningTeamID == 0 || winningTeamID == 1)
-            {
-                gmArmsRace.StartCoroutine(PointVisualizer.instance.DoWinSequence(gmArmsRace.p1Points, gmArmsRace.p2Points, gmArmsRace.p1Rounds, gmArmsRace.p2Rounds, winningTeamID == 0));
-            }
+            gmArmsRace.StartCoroutine(PointVisualizer.instance.DoWinSequence(gmArmsRace.p1Points, gmArmsRace.p2Points, gmArmsRace.p1Rounds, gmArmsRace.p2Rounds, winningTeamID == 0));
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
             yield return new WaitForSecondsRealtime(0.3f);
@@ -200,13 +202,13 @@ namespace FFAMod
                         yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
                         yield return new WaitForSecondsRealtime(0.1f);
                     }
-                    if (player.teamID == losingTeamID2 && losingTeamID2 >= 0)
+                    if (player.teamID == losingTeamID2)
                     {
                         yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
                         yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
                         yield return new WaitForSecondsRealtime(0.1f);
                     }
-                    if (player.teamID == losingTeamID3 && losingTeamID3 >= 0)
+                    if (player.teamID == losingTeamID3)
                     {
                         yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
                         yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
@@ -251,10 +253,7 @@ namespace FFAMod
         private static IEnumerator PointTransition(int winningTeamID, string winTextBefore, string winText)
         {
             GM_ArmsRace gmArmsRace = instance;
-            if (winningTeamID == 0 || winningTeamID == 1)
-            {
-                gmArmsRace.StartCoroutine(PointVisualizer.instance.DoSequence(gmArmsRace.p1Points, gmArmsRace.p2Points, winningTeamID == 0));
-            }
+            gmArmsRace.StartCoroutine(PointVisualizer.instance.DoSequence(gmArmsRace.p1Points, gmArmsRace.p2Points, winningTeamID == 0));
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
             yield return new WaitForSecondsRealtime(0.5f);
