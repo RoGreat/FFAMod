@@ -1,8 +1,13 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
+using Photon.Realtime;
 using SoundImplementation;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using UnityEngine;
 
 namespace FFAMod
@@ -20,9 +25,62 @@ namespace FFAMod
         private static int losingTeamID2 = -1;
         private static int losingTeamID3 = -1;
 
+        [HarmonyPatch("Awake")]
+        [HarmonyPostfix]
+        private static void AwakePostfix(ref int ___playersNeededToStart)
+        {
+            ___playersNeededToStart = 3;
+            Main.mod.Logger.Log("Initial max players: " + ___playersNeededToStart);
+            p3Points = 0;
+            p4Points = 0;
+            p3Rounds = 0;
+            p4Rounds = 0;
+            winningTeamID = -1;
+            losingTeamID = -1;
+            losingTeamID2 = -1;
+            losingTeamID3 = -1;
+        }
+
+        /*
+        [HarmonyPatch("Start")]
+        [HarmonyPostfix]
+        private static void StartPostfix()
+        {
+            Main.mod.Logger.Log("Max players: " + PlayerAssigner.instance.maxPlayers);
+        }
+        */
+
+        [HarmonyPatch("Start")]
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = instructions.ToList();
+            int startIndex = -1;
+            int endIndex = -1;
+            for (int i = 0; i < codes.Count; i++)
+            {
+                if (codes[i].opcode == OpCodes.Stfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(GM_ArmsRace), "playersNeededToStart"))
+                {
+                    if (codes[i - 1].opcode == OpCodes.Ldc_I4_2)
+                    {
+                        startIndex = i - 2;
+                        endIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (startIndex > -1 && endIndex > -1)
+            {
+                codes[startIndex].opcode = OpCodes.Nop;
+                codes.RemoveRange(startIndex + 1, endIndex - startIndex);
+            }
+            return codes.AsEnumerable();
+        }
+
+        /*
         [HarmonyPatch("Start")]
         private static bool Prefix(ref int ___playersNeededToStart, ref PhotonView ___view)
         {
+            Main.mod.Logger.Log("START");
             p3Points = 0;
             p4Points = 0;
             p3Rounds = 0;
@@ -46,7 +104,6 @@ namespace FFAMod
             Traverse.Create(playerManager).Property("PlayerJoinedAction").SetValue((Action<Player>)Delegate.Combine(playerManager.PlayerJoinedAction, new Action<Player>(instance.PlayerJoined)));
             ArtHandler.instance.NextArt();
             // ___playersNeededToStart = 4;
-            Main.mod.Logger.Log("Players needed to start: " + ___playersNeededToStart);
             // UIHandler.instance.SetNumberOfRounds(instance.roundsToWinGame);
             AccessTools.Method(typeof(UIHandler), "SetNumberOfRounds").Invoke(uiHandler, new object[] { instance.roundsToWinGame });
             playerAssigner.maxPlayers = ___playersNeededToStart;
@@ -56,25 +113,106 @@ namespace FFAMod
             }
             return false;
         }
+        */
 
         [HarmonyPatch("Update")]
-        private static void Postfix(ref int ___playersNeededToStart)
+        [HarmonyPostfix]
+        private static void UpdatePostfix(ref int ___playersNeededToStart)
         {
             if (Input.GetKey(KeyCode.Alpha2))
             {
+                Main.mod.Logger.Log("New max players: " + ___playersNeededToStart);
                 SoundPlayerStatic.Instance.PlayButtonClick();
             }
             if (Input.GetKey(KeyCode.Alpha3))
             {
                 ___playersNeededToStart = 3;
                 PlayerAssigner.instance.maxPlayers = ___playersNeededToStart;
+                Main.mod.Logger.Log("New max players: " + ___playersNeededToStart);
                 SoundPlayerStatic.Instance.PlayButtonClick();
             }
             if (Input.GetKey(KeyCode.Alpha4))
             {
+                Main.mod.Logger.Log("New max players: " + ___playersNeededToStart);
                 SoundPlayerStatic.Instance.PlayButtonClick();
             }
         }
+
+        [HarmonyPatch("PlayerJoined")]
+        private static bool Prefix(Player player, int ___playersNeededToStart)
+        {
+            if (PhotonNetwork.OfflineMode)
+            {
+                return false;
+            }
+            Main.mod.Logger.Log("Players needed to start: " + ___playersNeededToStart);
+            int count = PlayerManager.instance.players.Count;
+            Main.mod.Logger.Log("Player count: " + count);
+            if (!PhotonNetwork.OfflineMode)
+            {
+                instance.StartCoroutine(LobbyWait(count, ___playersNeededToStart));
+            }
+            player.data.isPlaying = false;
+            if (count >= 2)
+            {
+                instance.StartGame();
+                return false;
+            }
+            /*
+            if (!PhotonNetwork.OfflineMode)
+            {
+                if (player.data.view.IsMine)
+                {
+                    if (___playersNeededToStart - count == 3)
+                    {
+                        UIHandler.instance.ShowJoinGameText("ADD THREE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    }
+                    if (___playersNeededToStart - count == 2)
+                    {
+                        UIHandler.instance.ShowJoinGameText("ADD TWO MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    }
+                    if (___playersNeededToStart - count == 1)
+                    {
+                        UIHandler.instance.ShowJoinGameText("ADD ONE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    }
+                    // UIHandler.instance.ShowJoinGameText("WAITING", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                }
+                else
+                {
+                    UIHandler.instance.ShowJoinGameText("PRESS JUMP\n TO JOIN", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                }
+            }
+            player.data.isPlaying = false;
+            if (count >= ___playersNeededToStart)
+            {
+                instance.StartGame();
+                return false;
+            }
+            */
+            return false;
+        }
+
+        private static IEnumerator LobbyWait(int count, int playersNeededToStart)
+        {
+            for (int i = 15; i >= 0; i--)
+            {
+                if (playersNeededToStart - count == 3)
+                {
+                    UIHandler.instance.ShowJoinGameText(i + "\nADD THREE MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                }
+                if (playersNeededToStart - count == 2)
+                {
+                    UIHandler.instance.ShowJoinGameText(i + "\nADD TWO MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                }
+                if (playersNeededToStart - count == 1)
+                {
+                    UIHandler.instance.ShowJoinGameText(i + "\nADD ONE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                }
+                yield return new WaitForSecondsRealtime(1f);
+            }
+            yield break;
+        }
+
 
         [HarmonyPatch("PlayerDied")]
         private static bool Prefix(Player killedPlayer, int playersAlive, ref PhotonView ___view)
@@ -246,10 +384,12 @@ namespace FFAMod
                 num4--;
             string winTextBefore = num.ToString() + " - " + num2.ToString() + ", " + num3.ToString() + ", " + num4.ToString();
             string winText = instance.p1Points.ToString() + " - " + instance.p2Points.ToString() + ", " + p3Points.ToString() + ", " + p4Points.ToString();
-            instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
+            // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
+            instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
         }
 
+        /*
         private static IEnumerator PointTransition(int winningTeamID, string winTextBefore, string winText)
         {
             GM_ArmsRace gmArmsRace = instance;
@@ -267,5 +407,6 @@ namespace FFAMod
             // gmArmsRace.isTransitioning = false;
             AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(gmArmsRace, false);
         }
+        */
     }
 }
