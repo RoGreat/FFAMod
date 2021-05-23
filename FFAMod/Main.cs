@@ -1,5 +1,4 @@
-﻿/*
-using HarmonyLib;
+﻿using HarmonyLib;
 using System.Reflection;
 using UnityModManagerNet;
 
@@ -17,4 +16,3 @@ namespace FFAMod
         }
     }
 }
-*/
