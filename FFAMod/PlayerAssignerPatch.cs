@@ -1,66 +1,30 @@
 ﻿using HarmonyLib;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
+using InControl;
+using Photon.Pun;
+using SoundImplementation;
+using System.Collections;
+using UnityEngine;
 
-namespace FFAMod
+namespace FFAMod 
 {
     [HarmonyPatch(typeof(PlayerAssigner))]
-    internal class PlayerAssignerPatch
+    internal class PlayerAssignerPatch : PlayerAssigner
     {
+        [HarmonyPatch("RPCM_RequestTeamAndPlayerID")]
+        private static bool Prefix(int askingPlayer, ref bool ___waitingForRegisterResponse)
+        {
+            int count = PlayerManager.instance.players.Count;
+            int num = count;
+            instance.GetComponent<PhotonView>().RPC("RPC_ReturnPlayerAndTeamID", PhotonNetwork.CurrentRoom.GetPlayer(askingPlayer), new object[]
+            {
+                count,
+                num
+            });
+            ___waitingForRegisterResponse = true;
+            return false;
+        }
+
         [HarmonyPatch("CreatePlayer")]
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            var codes = instructions.ToList();
-            int startIndex = -1;
-            int endIndex = -1;
-            int startIndex2 = -1;
-            int endIndex2 = -1;
-            int stage = 0;
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (stage == 0 && codes[i].opcode == OpCodes.Ldfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet"))
-                {
-                    startIndex = i + 1;
-                    stage++;
-                }
-                else if (stage == 1 && codes[i].opcode == OpCodes.Stfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet"))
-                {
-                    endIndex = i;
-                    stage++;
-                }
-                else if (stage == 2 && codes[i].opcode == OpCodes.Ldfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet"))
-                {
-                    startIndex2 = i + 1;
-                    stage++;
-                }
-                else if (stage == 3 && codes[i].opcode == OpCodes.Stfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet"))
-                {
-                    endIndex2 = i;
-                    break;
-                }
-            }
-            if (startIndex > -1 && endIndex > -1)
-            {
-                codes[startIndex].opcode = OpCodes.Nop;
-                codes.RemoveRange(startIndex + 1, endIndex - startIndex - 1);
-            }
-            if (startIndex2 > -1 && endIndex2 > -1)
-            {
-                codes[startIndex2].opcode = OpCodes.Nop;
-                codes.RemoveRange(startIndex2 + 1, endIndex2 - startIndex2 - 1);
-            }
-            return codes.AsEnumerable();
-        }
-
-        [HarmonyPatch("RegisterPlayer")]
-        private static void Postfix(int teamID)
-        {
-            Main.mod.Logger.Log("Teams: " + teamID);
-        }
-
-        /*
         private static bool Prefix(ref IEnumerator __result, InputDevice inputDevice, bool isAI = false)
         {
             __result = CreatePlayerPatch(inputDevice, isAI);
@@ -72,13 +36,21 @@ namespace FFAMod
             PlayerAssigner playerAssigner = instance;
             var waitingForRegisterResponse = AccessTools.Field(typeof(PlayerAssigner), "waitingForRegisterResponse");
             var hasCreatedLocalPlayer = AccessTools.Field(typeof(PlayerAssigner), "hasCreatedLocalPlayer");
-            int playerIDToSet = (int)AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet").GetValue(instance);
-            int teamIDToSet = (int)AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet").GetValue(instance);
-            if (!(bool)waitingForRegisterResponse.GetValue(instance) && (PhotonNetwork.OfflineMode || !(bool)hasCreatedLocalPlayer.GetValue(instance)) && playerAssigner.players.Count < playerAssigner.maxPlayers)
+            var playerIDToSet = AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet");
+            var teamIDToSet = AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet");
+            if ((bool)waitingForRegisterResponse.GetValue(instance))
+            {
+                yield break;
+            }
+            if (!PhotonNetwork.OfflineMode && (bool)hasCreatedLocalPlayer.GetValue(playerAssigner))
+            {
+                yield break;
+            }
+            if (playerAssigner.players.Count < playerAssigner.maxPlayers)
             {
                 if (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)
                 {
-                    playerAssigner.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, (object)PhotonNetwork.LocalPlayer.ActorNumber);
+                    playerAssigner.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, new object[] { PhotonNetwork.LocalPlayer.ActorNumber });
                     waitingForRegisterResponse.SetValue(instance, true);
                 }
                 while ((bool)waitingForRegisterResponse.GetValue(instance))
@@ -87,16 +59,16 @@ namespace FFAMod
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        playerIDToSet = PlayerManager.instance.players.Count;
-                        teamIDToSet = playerIDToSet;
+                        playerIDToSet.SetValue(playerAssigner, PlayerManager.instance.players.Count);
+                        teamIDToSet.SetValue(playerAssigner, (int)playerIDToSet.GetValue(playerAssigner));
                     }
                 }
                 else
                 {
-                    playerIDToSet = PlayerManager.instance.players.Count;
-                    teamIDToSet = playerIDToSet;
+                    playerIDToSet.SetValue(playerAssigner, PlayerManager.instance.players.Count);
+                    teamIDToSet.SetValue(playerAssigner, (int)playerIDToSet.GetValue(playerAssigner));
                 }
-                hasCreatedLocalPlayer.SetValue(instance, true);
+                hasCreatedLocalPlayer.SetValue(playerAssigner, true);
                 SoundPlayerStatic.Instance.PlayPlayerAdded();
                 Vector3 position = Vector3.up * 100f;
                 CharacterData component = PhotonNetwork.Instantiate(playerAssigner.playerPrefab.name, position, Quaternion.identity).GetComponent<CharacterData>();
@@ -124,8 +96,40 @@ namespace FFAMod
                 }
                 playerAssigner.players.Add(component);
                 // playerAssigner.RegisterPlayer(component, playerAssigner.teamIDToSet, playerAssigner.playerIDToSet);
-                AccessTools.Method(typeof(PlayerAssigner), "RegisterPlayer").Invoke(playerAssigner, new object[] { component, teamIDToSet, playerIDToSet });
+                AccessTools.Method(typeof(PlayerAssigner), "RegisterPlayer").Invoke(playerAssigner, new object[] { component, teamIDToSet.GetValue(playerAssigner), playerIDToSet.GetValue(playerAssigner) });
+                yield break;
             }
+            yield break;
+        }
+
+        /*
+        [HarmonyTranspiler]
+        [HarmonyPatch("RPCM_RequestTeamAndPlayerID")]
+        private static IEnumerable<CodeInstruction> RPCM_RequestTeamAndPlayerIDTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = instructions.ToList();
+            int startIndex = -1;
+            int endIndex = -1;
+            int stage = 0;
+            for (int i = 0; i < codes.Count; i++)
+            {
+                if (stage == 0 && codes[i].opcode == OpCodes.Ldloc_0)
+                {
+                    startIndex = i + 1;
+                    stage++;
+                }
+                if (stage == 1 && codes[i].opcode == OpCodes.Stloc_1)
+                {
+                    endIndex = i;
+                    break;
+                }
+            }
+            if (startIndex > -1 && endIndex > -1)
+            {
+                codes[startIndex].opcode = OpCodes.Nop;
+                codes.RemoveRange(startIndex + 1, endIndex - startIndex - 1);
+            }
+            return codes.AsEnumerable();
         }
         */
     }

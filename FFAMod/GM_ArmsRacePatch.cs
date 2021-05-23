@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
-using Photon.Realtime;
 using SoundImplementation;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,122 +17,67 @@ namespace FFAMod
         public static int p4Points;
         public static int p3Rounds;
         public static int p4Rounds;
-
         public static int winningTeamID = -1;
         private static int losingTeamID = -1;
-        private static int losingTeamID2 = -1;
-        private static int losingTeamID3 = -1;
+        private static bool start = false;
 
-        [HarmonyPatch("Awake")]
-        [HarmonyPostfix]
-        private static void AwakePostfix(ref int ___playersNeededToStart)
+        [HarmonyPatch("Start")]
+        private static void Prefix()
         {
-            ___playersNeededToStart = 3;
-            Main.mod.Logger.Log("Initial max players: " + ___playersNeededToStart);
+            start = false;
             p3Points = 0;
             p4Points = 0;
             p3Rounds = 0;
             p4Rounds = 0;
             winningTeamID = -1;
             losingTeamID = -1;
-            losingTeamID2 = -1;
-            losingTeamID3 = -1;
         }
-
-        /*
-        [HarmonyPatch("Start")]
-        [HarmonyPostfix]
-        private static void StartPostfix()
-        {
-            Main.mod.Logger.Log("Max players: " + PlayerAssigner.instance.maxPlayers);
-        }
-        */
 
         [HarmonyPatch("Start")]
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var codes = instructions.ToList();
-            int startIndex = -1;
-            int endIndex = -1;
             for (int i = 0; i < codes.Count; i++)
             {
                 if (codes[i].opcode == OpCodes.Stfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(GM_ArmsRace), "playersNeededToStart"))
                 {
                     if (codes[i - 1].opcode == OpCodes.Ldc_I4_2)
                     {
-                        startIndex = i - 2;
-                        endIndex = i;
+                        codes[i - 1].opcode = OpCodes.Ldc_I4_4;
                         break;
                     }
                 }
             }
-            if (startIndex > -1 && endIndex > -1)
-            {
-                codes[startIndex].opcode = OpCodes.Nop;
-                codes.RemoveRange(startIndex + 1, endIndex - startIndex);
-            }
             return codes.AsEnumerable();
         }
 
-        /*
-        [HarmonyPatch("Start")]
-        private static bool Prefix(ref int ___playersNeededToStart, ref PhotonView ___view)
-        {
-            Main.mod.Logger.Log("START");
-            p3Points = 0;
-            p4Points = 0;
-            p3Rounds = 0;
-            p4Rounds = 0;
-            winningTeamID = -1;
-            losingTeamID = -1;
-            losingTeamID2 = -1;
-            losingTeamID3 = -1;
-            var playerManager = PlayerManager.instance;
-            var playerAssigner = PlayerAssigner.instance;
-            var uiHandler = UIHandler.instance;
-            ___view = instance.GetComponent<PhotonView>();
-            playerManager.SetPlayersSimulated(false);
-            playerAssigner.maxPlayers = ___playersNeededToStart;
-            // PlayerAssigner.instance.SetPlayersCanJoin(true);
-            AccessTools.Method(typeof(PlayerAssigner), "SetPlayersCanJoin").Invoke(playerAssigner, new object[] { true });
-            // PlayerManager.instance.AddPlayerDiedAction(new Action<Player, int>(this.PlayerDied));
-            AccessTools.Method(typeof(PlayerManager), "AddPlayerDiedAction").Invoke(playerManager, new object[] { new Action<Player, int>(instance.PlayerDied) });
-
-            // playerManager.PlayerJoinedAction = (Action<Player>)Delegate.Combine(playerManager.PlayerJoinedAction, new Action<Player>(instance.PlayerJoined));
-            Traverse.Create(playerManager).Property("PlayerJoinedAction").SetValue((Action<Player>)Delegate.Combine(playerManager.PlayerJoinedAction, new Action<Player>(instance.PlayerJoined)));
-            ArtHandler.instance.NextArt();
-            // ___playersNeededToStart = 4;
-            // UIHandler.instance.SetNumberOfRounds(instance.roundsToWinGame);
-            AccessTools.Method(typeof(UIHandler), "SetNumberOfRounds").Invoke(uiHandler, new object[] { instance.roundsToWinGame });
-            playerAssigner.maxPlayers = ___playersNeededToStart;
-            if (!PhotonNetwork.OfflineMode)
-            {
-                uiHandler.ShowJoinGameText("PRESS JUMP\n TO JOIN", PlayerSkinBank.GetPlayerSkinColors(0).winText);
-            }
-            return false;
-        }
-        */
-
         [HarmonyPatch("Update")]
-        [HarmonyPostfix]
-        private static void UpdatePostfix(ref int ___playersNeededToStart)
+        private static void Postfix()
         {
-            if (Input.GetKey(KeyCode.Alpha2))
+            if (!PhotonNetwork.OfflineMode && PhotonNetwork.IsMasterClient)
             {
-                Main.mod.Logger.Log("New max players: " + ___playersNeededToStart);
-                SoundPlayerStatic.Instance.PlayButtonClick();
-            }
-            if (Input.GetKey(KeyCode.Alpha3))
-            {
-                ___playersNeededToStart = 3;
-                PlayerAssigner.instance.maxPlayers = ___playersNeededToStart;
-                Main.mod.Logger.Log("New max players: " + ___playersNeededToStart);
-                SoundPlayerStatic.Instance.PlayButtonClick();
-            }
-            if (Input.GetKey(KeyCode.Alpha4))
-            {
-                Main.mod.Logger.Log("New max players: " + ___playersNeededToStart);
-                SoundPlayerStatic.Instance.PlayButtonClick();
+                int count = PlayerManager.instance.players.Count;
+                if (count >= 2)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        Player player = PlayerManager.instance.players[i];
+                        if (player.data.view.IsMine)
+                        {
+                            if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
+                            {
+                                if (Input.GetKeyDown(KeyCode.Space))
+                                {
+                                    start = true;
+                                }
+                            }
+                            else if (player.data.playerActions.Device.CommandWasPressed)
+                            {
+                                start = true;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -145,74 +88,100 @@ namespace FFAMod
             {
                 return false;
             }
-            Main.mod.Logger.Log("Players needed to start: " + ___playersNeededToStart);
             int count = PlayerManager.instance.players.Count;
-            Main.mod.Logger.Log("Player count: " + count);
-            if (!PhotonNetwork.OfflineMode)
-            {
-                instance.StartCoroutine(LobbyWait(count, ___playersNeededToStart));
-            }
-            player.data.isPlaying = false;
-            if (count >= 2)
-            {
-                instance.StartGame();
-                return false;
-            }
-            /*
             if (!PhotonNetwork.OfflineMode)
             {
                 if (player.data.view.IsMine)
                 {
-                    if (___playersNeededToStart - count == 3)
-                    {
-                        UIHandler.instance.ShowJoinGameText("ADD THREE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                    }
-                    if (___playersNeededToStart - count == 2)
-                    {
-                        UIHandler.instance.ShowJoinGameText("ADD TWO MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                    }
-                    if (___playersNeededToStart - count == 1)
-                    {
-                        UIHandler.instance.ShowJoinGameText("ADD ONE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                    }
-                    // UIHandler.instance.ShowJoinGameText("WAITING", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    start = MasterStartGame(player, count, ___playersNeededToStart);
                 }
                 else
                 {
                     UIHandler.instance.ShowJoinGameText("PRESS JUMP\n TO JOIN", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    return false;
                 }
             }
             player.data.isPlaying = false;
-            if (count >= ___playersNeededToStart)
+            if (count >= 2 && start)
             {
                 instance.StartGame();
-                return false;
             }
-            */
+            else if (count < 2)
+            {
+                start = false;
+            }
             return false;
         }
 
-        private static IEnumerator LobbyWait(int count, int playersNeededToStart)
+        private static bool MasterStartGame(Player player, int count, int playersNeededToStart)
         {
-            for (int i = 15; i >= 0; i--)
+            if (playersNeededToStart - count == 2)
             {
-                if (playersNeededToStart - count == 3)
-                {
-                    UIHandler.instance.ShowJoinGameText(i + "\nADD THREE MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                }
-                if (playersNeededToStart - count == 2)
-                {
-                    UIHandler.instance.ShowJoinGameText(i + "\nADD TWO MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                }
-                if (playersNeededToStart - count == 1)
-                {
-                    UIHandler.instance.ShowJoinGameText(i + "\nADD ONE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                }
-                yield return new WaitForSecondsRealtime(1f);
+                if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
+                    UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [SPACE] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                else
+                    UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [START] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
             }
-            yield break;
+            else if (playersNeededToStart - count == 1)
+            {
+                if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
+                    UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [SPACE] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                else
+                    UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [START] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+            }
+            else if (playersNeededToStart - count == 0)
+                return true;
+            return false;
         }
 
+        [HarmonyPatch("DoStartGame")]
+        private static bool Prefix(ref IEnumerator __result)
+        {
+            __result = DoStartGamePatch();
+            return false;
+        }
+        private static IEnumerator DoStartGamePatch()
+        {
+            var WaitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
+            var SetPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
+            GameManager.instance.battleOngoing = false;
+            UIHandler.instance.ShowJoinGameText("LETS GOO!", PlayerSkinBank.GetPlayerSkinColors(1).winText);
+            yield return new WaitForSeconds(0.25f);
+            UIHandler.instance.HideJoinGameText();
+            PlayerManager.instance.SetPlayersSimulated(false);
+            // PlayerManager.instance.SetPlayersVisible(false);
+            SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
+            MapManager.instance.LoadNextLevel();
+            TimeHandler.instance.DoSpeedUp();
+            yield return new WaitForSecondsRealtime(1f);
+            if (instance.pickPhase)
+            {
+                for (int i = 0; i < PlayerManager.instance.players.Count; i++)
+                {
+                    Player player = PlayerManager.instance.players[i];
+                    yield return instance.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(instance, null));
+                    CardChoiceVisuals.instance.Show(i, true);
+                    if (player.GetComponent<PlayerAPI>().enabled == true)
+                    {
+                        // AIPick(player);
+                        yield return new WaitForSecondsRealtime(0.3f);
+                    }
+                    else
+                        yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Team);
+                    yield return new WaitForSecondsRealtime(0.3f);
+                }
+                yield return instance.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(instance, null));
+                CardChoiceVisuals.instance.Hide();
+            }
+            MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
+            TimeHandler.instance.DoSpeedUp();
+            TimeHandler.instance.StartGame();
+            GameManager.instance.battleOngoing = true;
+            UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            // PlayerManager.instance.SetPlayersVisible(true);
+            SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
+            yield break;
+        }
 
         [HarmonyPatch("PlayerDied")]
         private static bool Prefix(Player killedPlayer, int playersAlive, ref PhotonView ___view)
@@ -231,6 +200,8 @@ namespace FFAMod
         [HarmonyPatch("RPCA_NextRound")]
         private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning)
         {
+            int losingTeamID2 = -1;
+            int losingTeamID3 = -1;
             if (PlayerManager.instance.players.Count >= 3)
             {
                 losingTeamID2 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 2);
@@ -242,8 +213,8 @@ namespace FFAMod
                 Debug.Log("Losing team: " + losingTeamID3);
             }
             GM_ArmsRacePatch.losingTeamID = losingTeamID;
-            Debug.Log("Losing team: " + losingTeamID);
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
+            Debug.Log("Losing team: " + losingTeamID);
             Debug.Log("Winning team: " + winningTeamID);
             if (___isTransitioning)
                 return false;
@@ -329,34 +300,29 @@ namespace FFAMod
                 Debug.Log("PICK PHASE");
                 // PlayerManager.instance.SetPlayersVisible(false);
                 SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
-                yield return new WaitForSecondsRealtime(0.1f);
                 for (int i = 0; i < PlayerManager.instance.players.Count; i++)
                 {
                     Player player = PlayerManager.instance.players[i];
-                    if (player.teamID == losingTeamID)
+                    if (player.teamID != winningTeamID)
                     {
                         // yield return gmArmsRace.StartCoroutine(gmArmsRace.WaitForSyncUp());
                         yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
-                        yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
-                        yield return new WaitForSecondsRealtime(0.1f);
-                    }
-                    if (player.teamID == losingTeamID2)
-                    {
-                        yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
-                        yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
-                        yield return new WaitForSecondsRealtime(0.1f);
-                    }
-                    if (player.teamID == losingTeamID3)
-                    {
-                        yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
-                        yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
-                        yield return new WaitForSecondsRealtime(0.1f);
+                        CardChoiceVisuals.instance.Show(i, true);
+                        if (player.GetComponent<PlayerAPI>().enabled == true)
+                        {
+                            // AIPick(player);
+                            yield return new WaitForSecondsRealtime(0.3f);
+                        }
+                        else if (player.teamID != winningTeamID)
+                            yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
+                        yield return new WaitForSecondsRealtime(0.3f);
                     }
                 }
                 // PlayerManager.instance.SetPlayersVisible(true);
                 SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
             }
-            yield return gmArmsRace.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp").Invoke(gmArmsRace, null));
+            yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
+            CardChoiceVisuals.instance.Hide();
             TimeHandler.instance.DoSlowDown();
             MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
             PlayerManager.instance.RevivePlayers();
@@ -382,30 +348,57 @@ namespace FFAMod
                 num3--;
             else
                 num4--;
-            string winTextBefore = num.ToString() + " - " + num2.ToString() + ", " + num3.ToString() + ", " + num4.ToString();
-            string winText = instance.p1Points.ToString() + " - " + instance.p2Points.ToString() + ", " + p3Points.ToString() + ", " + p4Points.ToString();
+            string winTextBefore = num.ToString() + " - " + num2.ToString();
+            string winText = instance.p1Points.ToString() + " - " + instance.p2Points.ToString();
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
             instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
         }
 
         /*
-        private static IEnumerator PointTransition(int winningTeamID, string winTextBefore, string winText)
+        private static void AIPick(Player player)
         {
-            GM_ArmsRace gmArmsRace = instance;
-            gmArmsRace.StartCoroutine(PointVisualizer.instance.DoSequence(gmArmsRace.p1Points, gmArmsRace.p2Points, winningTeamID == 0));
-            yield return new WaitForSecondsRealtime(1f);
-            MapManager.instance.LoadNextLevel();
-            yield return new WaitForSecondsRealtime(0.5f);
-            yield return gmArmsRace.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp").Invoke(gmArmsRace, null));
-            
-            MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
-            PlayerManager.instance.RevivePlayers();
-            yield return new WaitForSecondsRealtime(0.3f);
-            TimeHandler.instance.DoSpeedUp();
-            GameManager.instance.battleOngoing = true;
-            // gmArmsRace.isTransitioning = false;
-            AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(gmArmsRace, false);
+            // StartPick
+            // CardChoice.instance.pickerType = player.playerID;
+            AccessTools.Field(typeof(CardChoice), "pickerType").SetValue(CardChoice.instance, PickerType.Team);
+            CardChoice.instance.pickrID = player.playerID;
+            CardChoice.instance.picks = 1;
+            ArtHandler.instance.SetSpecificArt(CardChoice.instance.cardPickArt);
+            // DoPlayerSelect
+            SoundMusicManager.Instance.PlayIngame(true);
+            // var replaceCardsMethod = AccessTools.Method(typeof(CardChoice), "ReplaceCards");
+            var getRanomCardMethod = AccessTools.Method(typeof(CardChoice), "GetRanomCard");
+            var getRanomCardInvoke = (GameObject)getRanomCardMethod.Invoke(CardChoice.instance, null);
+            GameObject getRandomCard = getRanomCardInvoke.gameObject;
+            getRandomCard.GetComponent<CardInfo>().sourceCard = getRandomCard.GetComponent<CardInfo>();
+            CardChoice.instance.Pick(getRandomCard, false);
+            CardChoice.instance.pickrID = -1;
+            var setCurrentSelected = AccessTools.Method(typeof(CardChoiceVisuals), "SetCurrentSelected");
+            // CardChoiceVisuals.instance.SetCurrentSelected(this.currentlySelectedCard);
+            setCurrentSelected.Invoke(CardChoiceVisuals.instance, new object[] { 0 });
+            // End of Pick(GameObject pickedCard, bool clear)
+            //if (PlayerManager.instance.players[CardChoice.instance.pickrID].data.view.IsMine)
+            //{
+            //    var replaceCards = (IEnumerator)replaceCardsMethod.Invoke(CardChoice.instance, new object[] { getRandomCard, true });
+            //    CardChoice.instance.StartCoroutine(replaceCards);
+            //}
+            UIHandler.instance.StopShowPicker();
+            CardChoiceVisuals.instance.Hide();
+
+
+            CardChoice.instance.pickerType = PickerType.Team;
+            CardChoice.instance.pickrID = player.playerID;
+            // ArtHandler.instance.SetSpecificArt(CardChoice.instance.cardPickArt);
+            // Update => DoPlayerSelect
+            SoundMusicManager.Instance.PlayIngame(true);
+            // SpawnUniqueCard => GetRanomCard
+            var getRanomCardMethod = AccessTools.Method(typeof(CardChoice), "GetRanomCard");
+            var getRanomCardInvoke = (GameObject)getRanomCardMethod.Invoke(CardChoice.instance, null);
+            GameObject getRandomCard = getRanomCardInvoke.gameObject;
+            // Update => DoPlayerSelect
+            CardChoice.instance.Pick(getRandomCard, false);
+            CardChoice.instance.pickrID = -1;
+            // CardChoiceVisuals.instance.Hide();
         }
         */
     }

@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FFAMod
@@ -6,6 +8,31 @@ namespace FFAMod
     [HarmonyPatch(typeof(PlayerManager))]
     internal class PlayerManagerPatch : PlayerManager
     {
+        [HarmonyPatch("GetOtherTeam")]
+        private static bool Prefix(ref int __result, int team)
+        {
+            __result = GetOtherTeamPatch(team);
+            return false;
+        }
+
+        public static int GetOtherTeamPatch(int team, int offset = 1)
+        {
+            int[] array;
+            if (instance.players.Count == 4)
+            {
+                array = new int[4] { 0, 1, 2, 3 };
+            }
+            else if (instance.players.Count == 3)
+            {
+                array = new int[3] { 0, 1, 2 };
+            }
+            else
+            {
+                array = new int[2] { 0, 1 };
+            }
+            return array[(team + offset) % array.Length];
+        }
+
         [HarmonyPatch("GetClosestPlayerInTeam")]
         private static bool Prefix(ref Player __result, Vector3 position, int team, bool needVision = false)
         {
@@ -15,31 +42,39 @@ namespace FFAMod
 
         private static Player GetClosestPlayerInTeamPatch(Vector3 position, int team, bool needVision = false)
         {
+            switch (instance.players.Count)
+            {
+                case 2:
+                    team = GetOtherTeamPatch(team, 1);
+                    break;
+                case 3:
+                    team = GetOtherTeamPatch(team, 2);
+                    break;
+                case 4:
+                    team = GetOtherTeamPatch(team, 3);
+                    break;
+                default:
+                    team = 0;
+                    break;
+            }
             float num = float.MaxValue;
             float num2 = 0;
-            int index = 0;
+            Player[] players = instance.players.ToArray();
             Player result = null;
-            var array = new float[4];
-            for (int i = 0; i < instance.players.Count; i++)
+            var dictionary = new Dictionary<int, float>();
+            for (int i = 0; i < players.Length; i++)
             {
-                num2 = Vector2.Distance(position, instance.players[i].transform.position);
-                if (!instance.players[i].data.dead && instance.players[i].playerID != team - 1)
-                {
-                    array[i] = num2;
-                }
+                num2 = Vector2.Distance(position, players[i].transform.position);
+                if (!players[i].data.dead && players[i].teamID != team)
+                    dictionary.Add(i, num2);
             }
-            for (int i = 1; i < instance.players.Count; i++)
+            if (dictionary.Count == 0)
+                return result;
+            int j = dictionary.OrderBy(x => x.Value).First().Key;
+            num2 = dictionary.OrderBy(x => x.Value).First().Value;
+            if ((!needVision || instance.CanSeePlayer(position, players[j]).canSee) && num2 < num)
             {
-                if (array[i] < array[0])
-                {
-                    num2 = array[i];
-                    index = i;
-                }
-            }
-            if ((!needVision || instance.CanSeePlayer(position, instance.players[index]).canSee) && num2 < num)
-            {
-                num = num2;
-                result = instance.players[index];
+                result = players[j];
             }
             return result;
         }
@@ -87,24 +122,6 @@ namespace FFAMod
                 num++;
             }
             return num;
-        }
-
-        public static int GetOtherTeamPatch(int team, int offset = 1)
-        {
-            int[] array;
-            if (instance.players.Count == 4)
-            {
-                array = new int[4] { 0, 1, 2, 3 };
-            }
-            else if (instance.players.Count == 3)
-            {
-                array = new int[3] { 0, 1, 2 };
-            }
-            else
-            {
-                array = new int[2] { 0, 1 };
-            }
-            return array[(team + offset) % array.Length];
         }
     }
 }

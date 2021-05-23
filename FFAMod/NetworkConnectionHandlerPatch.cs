@@ -24,11 +24,5 @@ namespace FFAMod
             }
             return codes.AsEnumerable();
         }
-
-        [HarmonyPatch("CreateRoom")]
-        private static void Prefix(RoomOptions roomOptions)
-        {
-            Main.mod.Logger.Log("Room max players: " + roomOptions.MaxPlayers);
-        }
     }
 }
