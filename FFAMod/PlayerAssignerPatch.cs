@@ -39,13 +39,9 @@ namespace FFAMod
             var playerIDToSet = AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet");
             var teamIDToSet = AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet");
             if ((bool)waitingForRegisterResponse.GetValue(instance))
-            {
                 yield break;
-            }
             if (!PhotonNetwork.OfflineMode && (bool)hasCreatedLocalPlayer.GetValue(playerAssigner))
-            {
                 yield break;
-            }
             if (playerAssigner.players.Count < playerAssigner.maxPlayers)
             {
                 if (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)

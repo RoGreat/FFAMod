@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
-using SoundImplementation;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +18,12 @@ namespace FFAMod
         public static int p4Rounds;
         public static int winningTeamID = -1;
         private static int losingTeamID = -1;
-        private static bool start = false;
+        private static bool isReady;
 
         [HarmonyPatch("Start")]
         private static void Prefix()
         {
-            start = false;
+            isReady = false;
             p3Points = 0;
             p4Points = 0;
             p3Rounds = 0;
@@ -54,7 +53,7 @@ namespace FFAMod
         [HarmonyPatch("Update")]
         private static void Postfix()
         {
-            if (!PhotonNetwork.OfflineMode && PhotonNetwork.IsMasterClient)
+            if (!PhotonNetwork.OfflineMode && !GameManager.instance.isPlaying)
             {
                 int count = PlayerManager.instance.players.Count;
                 if (count >= 2)
@@ -62,23 +61,37 @@ namespace FFAMod
                     for (int i = 0; i < count; i++)
                     {
                         Player player = PlayerManager.instance.players[i];
-                        if (player.data.view.IsMine)
-                        {
-                            if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
-                            {
-                                if (Input.GetKeyDown(KeyCode.Space))
-                                {
-                                    start = true;
-                                }
-                            }
-                            else if (player.data.playerActions.Device.CommandWasPressed)
-                            {
-                                start = true;
-                            }
-                        }
+                        instance.StartCoroutine(WaitToStart(player));
                     }
                 }
             }
+        }
+
+        private static IEnumerator WaitToStart(Player player)
+        {
+            if (player.data.view.IsMine && player.data.isPlaying == false)
+            {
+                yield return new WaitForSeconds(0.1f);
+                if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        isReady = true;
+                    }
+                }
+                else if (player.data.playerActions.Device.CommandWasPressed)
+                {
+                    isReady = true;
+                }
+            }
+            if (isReady)
+            {
+                var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
+                yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
+                instance.StartGame();
+                isReady = false;
+            }
+            yield break;
         }
 
         [HarmonyPatch("PlayerJoined")]
@@ -93,44 +106,31 @@ namespace FFAMod
             {
                 if (player.data.view.IsMine)
                 {
-                    start = MasterStartGame(player, count, ___playersNeededToStart);
+                    if (___playersNeededToStart - count == 2)
+                    {
+                        if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
+                            UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [SPACE] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                        else
+                            UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [START] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    }
+                    else if (___playersNeededToStart - count == 1)
+                    {
+                        if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
+                            UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [SPACE] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                        else
+                            UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [START] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    }
                 }
                 else
                 {
                     UIHandler.instance.ShowJoinGameText("PRESS JUMP\n TO JOIN", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                    return false;
                 }
             }
             player.data.isPlaying = false;
-            if (count >= 2 && start)
+            if (count >= ___playersNeededToStart)
             {
                 instance.StartGame();
             }
-            else if (count < 2)
-            {
-                start = false;
-            }
-            return false;
-        }
-
-        private static bool MasterStartGame(Player player, int count, int playersNeededToStart)
-        {
-            if (playersNeededToStart - count == 2)
-            {
-                if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
-                    UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [SPACE] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                else
-                    UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [START] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-            }
-            else if (playersNeededToStart - count == 1)
-            {
-                if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
-                    UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [SPACE] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                else
-                    UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [START] TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-            }
-            else if (playersNeededToStart - count == 0)
-                return true;
             return false;
         }
 
@@ -142,15 +142,15 @@ namespace FFAMod
         }
         private static IEnumerator DoStartGamePatch()
         {
-            var WaitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
-            var SetPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
+            var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
+            var setPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
             GameManager.instance.battleOngoing = false;
             UIHandler.instance.ShowJoinGameText("LETS GOO!", PlayerSkinBank.GetPlayerSkinColors(1).winText);
             yield return new WaitForSeconds(0.25f);
             UIHandler.instance.HideJoinGameText();
             PlayerManager.instance.SetPlayersSimulated(false);
             // PlayerManager.instance.SetPlayersVisible(false);
-            SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
+            setPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
             MapManager.instance.LoadNextLevel();
             TimeHandler.instance.DoSpeedUp();
             yield return new WaitForSecondsRealtime(1f);
@@ -159,7 +159,7 @@ namespace FFAMod
                 for (int i = 0; i < PlayerManager.instance.players.Count; i++)
                 {
                     Player player = PlayerManager.instance.players[i];
-                    yield return instance.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(instance, null));
+                    yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
                     CardChoiceVisuals.instance.Show(i, true);
                     if (player.GetComponent<PlayerAPI>().enabled == true)
                     {
@@ -170,7 +170,7 @@ namespace FFAMod
                         yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Team);
                     yield return new WaitForSecondsRealtime(0.3f);
                 }
-                yield return instance.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(instance, null));
+                yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
                 CardChoiceVisuals.instance.Hide();
             }
             MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
@@ -179,7 +179,7 @@ namespace FFAMod
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
             // PlayerManager.instance.SetPlayersVisible(true);
-            SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
+            setPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
             yield break;
         }
 
