@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
+using SoundImplementation;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,7 +164,7 @@ namespace FFAMod
                     CardChoiceVisuals.instance.Show(i, true);
                     if (player.GetComponent<PlayerAPI>().enabled == true)
                     {
-                        // AIPick(player);
+                        AIPick(player);
                         yield return new WaitForSecondsRealtime(0.3f);
                     }
                     else
@@ -310,7 +311,7 @@ namespace FFAMod
                         CardChoiceVisuals.instance.Show(i, true);
                         if (player.GetComponent<PlayerAPI>().enabled == true)
                         {
-                            // AIPick(player);
+                            AIPick(player);
                             yield return new WaitForSecondsRealtime(0.3f);
                         }
                         else if (player.teamID != winningTeamID)
@@ -338,16 +339,10 @@ namespace FFAMod
         {
             int num = instance.p1Points;
             int num2 = instance.p2Points;
-            int num3 = p3Points;
-            int num4 = p4Points;
             if (winningTeamID == 0)
                 num--;
-            else if (winningTeamID == 1)
-                num2--;
-            else if (winningTeamID == 2)
-                num3--;
             else
-                num4--;
+                num2--;
             string winTextBefore = num.ToString() + " - " + num2.ToString();
             string winText = instance.p1Points.ToString() + " - " + instance.p2Points.ToString();
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
@@ -355,51 +350,28 @@ namespace FFAMod
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
         }
 
-        /*
         private static void AIPick(Player player)
         {
-            // StartPick
+            // // DoPick
             // CardChoice.instance.pickerType = player.playerID;
             AccessTools.Field(typeof(CardChoice), "pickerType").SetValue(CardChoice.instance, PickerType.Team);
+            // // StartPick
             CardChoice.instance.pickrID = player.playerID;
             CardChoice.instance.picks = 1;
             ArtHandler.instance.SetSpecificArt(CardChoice.instance.cardPickArt);
+            // // Pick
             // DoPlayerSelect
             SoundMusicManager.Instance.PlayIngame(true);
-            // var replaceCardsMethod = AccessTools.Method(typeof(CardChoice), "ReplaceCards");
             var getRanomCardMethod = AccessTools.Method(typeof(CardChoice), "GetRanomCard");
-            var getRanomCardInvoke = (GameObject)getRanomCardMethod.Invoke(CardChoice.instance, null);
-            GameObject getRandomCard = getRanomCardInvoke.gameObject;
-            getRandomCard.GetComponent<CardInfo>().sourceCard = getRandomCard.GetComponent<CardInfo>();
-            CardChoice.instance.Pick(getRandomCard, false);
+            var getRanomCard = (GameObject)getRanomCardMethod.Invoke(CardChoice.instance, null);
+            getRanomCard.GetComponent<CardInfo>().sourceCard = getRanomCard.GetComponent<CardInfo>();
+            getRanomCard.transform.root.GetComponentInChildren<ApplyCardStats>().Pick(CardChoice.instance.pickrID, true);
             CardChoice.instance.pickrID = -1;
             var setCurrentSelected = AccessTools.Method(typeof(CardChoiceVisuals), "SetCurrentSelected");
             // CardChoiceVisuals.instance.SetCurrentSelected(this.currentlySelectedCard);
             setCurrentSelected.Invoke(CardChoiceVisuals.instance, new object[] { 0 });
-            // End of Pick(GameObject pickedCard, bool clear)
-            //if (PlayerManager.instance.players[CardChoice.instance.pickrID].data.view.IsMine)
-            //{
-            //    var replaceCards = (IEnumerator)replaceCardsMethod.Invoke(CardChoice.instance, new object[] { getRandomCard, true });
-            //    CardChoice.instance.StartCoroutine(replaceCards);
-            //}
             UIHandler.instance.StopShowPicker();
             CardChoiceVisuals.instance.Hide();
-
-
-            CardChoice.instance.pickerType = PickerType.Team;
-            CardChoice.instance.pickrID = player.playerID;
-            // ArtHandler.instance.SetSpecificArt(CardChoice.instance.cardPickArt);
-            // Update => DoPlayerSelect
-            SoundMusicManager.Instance.PlayIngame(true);
-            // SpawnUniqueCard => GetRanomCard
-            var getRanomCardMethod = AccessTools.Method(typeof(CardChoice), "GetRanomCard");
-            var getRanomCardInvoke = (GameObject)getRanomCardMethod.Invoke(CardChoice.instance, null);
-            GameObject getRandomCard = getRanomCardInvoke.gameObject;
-            // Update => DoPlayerSelect
-            CardChoice.instance.Pick(getRandomCard, false);
-            CardChoice.instance.pickrID = -1;
-            // CardChoiceVisuals.instance.Hide();
         }
-        */
     }
 }

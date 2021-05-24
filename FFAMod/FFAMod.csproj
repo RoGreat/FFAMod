@@ -57,6 +57,9 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\PhotonUnityNetworking.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="SonigonAudioEngine.Runtime">
+      <HintPath>D:\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\SonigonAudioEngine.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
@@ -72,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharacterSelectionInstancePatch.cs" />
+    <Compile Include="ApplyCardStatsPatch.cs" />
     <Compile Include="FFAPlugin.cs" />
     <Compile Include="PlayerAssignerPatch.cs" />
     <Compile Include="NetworkConnectionHandlerPatch.cs" />

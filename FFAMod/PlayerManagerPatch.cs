@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,13 +8,6 @@ namespace FFAMod
     [HarmonyPatch(typeof(PlayerManager))]
     internal class PlayerManagerPatch : PlayerManager
     {
-        [HarmonyPatch("GetOtherTeam")]
-        private static bool Prefix(ref int __result, int team)
-        {
-            __result = GetOtherTeamPatch(team);
-            return false;
-        }
-
         public static int GetOtherTeamPatch(int team, int offset = 1)
         {
             int[] array;
@@ -36,38 +28,26 @@ namespace FFAMod
         }
         private static Player GetClosestPlayerInTeamPatch(Vector3 position, int team, bool needVision = false)
         {
+            Player result = null;
+            bool isTransitioning = (bool)AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").GetValue(GM_ArmsRace.instance);
+            if (isTransitioning)
+                return result;
             Player[] players = instance.players.ToArray();
-            switch (players.Length)
-            {
-                case 2:
-                    team = GetOtherTeamPatch(team, 1);
-                    break;
-                case 3:
-                    team = GetOtherTeamPatch(team, 2);
-                    break;
-                case 4:
-                    team = GetOtherTeamPatch(team, 3);
-                    break;
-                default:
-                    team = 0;
-                    break;
-            }
             float num = float.MaxValue;
             float num2 = 0;
-            Player result = null;
             var dictionary = new Dictionary<int, float>();
             for (int i = 0; i < players.Length; i++)
             {
                 num2 = Vector2.Distance(position, players[i].transform.position);
-                if (!players[i].data.dead && players[i].teamID != team)
+                if (!players[i].data.dead && num2 > 0)
                     dictionary.Add(i, num2);
             }
             if (dictionary.Count == 0)
                 return result;
-                int j = dictionary.OrderBy(x => x.Value).First().Key;
-                num2 = dictionary.OrderBy(x => x.Value).First().Value;
-                if ((!needVision || instance.CanSeePlayer(position, players[j]).canSee) && num2 < num)
-                    result = players[j];
+            int j = dictionary.OrderBy(x => x.Value).First().Key;
+            num2 = dictionary.OrderBy(x => x.Value).First().Value;
+            if ((!needVision || instance.CanSeePlayer(position, players[j]).canSee) && num2 < num)
+                result = players[j];
             return result;
         }
 

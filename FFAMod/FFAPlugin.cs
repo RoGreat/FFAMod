@@ -10,9 +10,9 @@ namespace FFAMod
     {
         private void Start()
         {
-            Logger.LogInfo("Free For All Mod Loaded");
             var harmony = new Harmony("mod.rounds.all.for.free");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+            Logger.LogInfo("Free For All Mod Loaded");
         }
     }
 }
