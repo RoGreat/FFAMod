@@ -8,7 +8,7 @@ namespace FFAMod
         [HarmonyPatch("Update")]
         private static void Prefix(CharacterSelectionInstance __instance)
         {
-            if (!__instance.currentPlayer)
+            if (__instance.currentPlayer == null)
             {
                 return;
             }

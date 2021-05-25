@@ -150,7 +150,7 @@ namespace FFAMod
         }
 
         [HarmonyPatch("PlayerDied")]
-        private static bool Prefix(Player killedPlayer, int playersAlive, ref PhotonView ___view)
+        private static bool Prefix(Player killedPlayer, int playersAlive, PhotonView ___view)
         {
             if (!PhotonNetwork.OfflineMode)
                 Debug.Log("PlayerDied: " + killedPlayer.data.view.Owner.NickName);
@@ -319,6 +319,7 @@ namespace FFAMod
         {
             // // DoPick
             // CardChoice.instance.pickerType = player.playerID;
+            UnityEngine.Debug.Log("AI Picks Card");
             AccessTools.Field(typeof(CardChoice), "pickerType").SetValue(CardChoice.instance, PickerType.Team);
             // // StartPick
             CardChoice.instance.pickrID = player.playerID;
