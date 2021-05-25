@@ -37,6 +37,10 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(GameFolder)\Rounds_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+			<Private>False</Private>
+    </Reference>
     <Reference Include="BepInEx">
       <HintPath>$(GameFolder)\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>

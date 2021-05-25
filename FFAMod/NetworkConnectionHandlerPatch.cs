@@ -1,19 +1,19 @@
 ﻿using HarmonyLib;
-using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using Steamworks;
+using Landfall.Network;
 
 namespace FFAMod
 {
     [HarmonyPatch(typeof(NetworkConnectionHandler))]
     internal class NetworkConnectionHandlerPatch
     {
-        [HarmonyTranspiler]
         [HarmonyPatch("HostPrivateAndInviteFriend")]
-        private static IEnumerable<CodeInstruction> HostPrivateAndInviteFriendTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var codes = instructions.ToList();
             for(int i = 0; i < codes.Count; i++)
@@ -26,26 +26,16 @@ namespace FFAMod
             }
             return codes.AsEnumerable();
         }
+    }
 
-        [HarmonyTranspiler]
-        [HarmonyPatch("OnPlayerEnteredRoom")]
-        private static IEnumerable<CodeInstruction> OnPlayerEnteredRoomTranspiler(IEnumerable<CodeInstruction> instructions)
+    [HarmonyPatch(typeof(ClientSteamLobby))]
+    internal class ClientSteamLobbyPatch
+    {
+
+        [HarmonyPatch("HideLobby")]
+        private static void Postfix(ClientSteamLobby __instance)
         {
-            var codes = instructions.ToList();
-            int stage = 0;
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (stage == 0 && codes[i].opcode == OpCodes.Call && codes[i].operand is MethodInfo && (codes[i].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(PhotonNetwork), "PlayerList"))
-                {
-                    stage++;
-                }
-                if (stage == 1 && codes[i].opcode == OpCodes.Ldc_I4_2)
-                {
-                    codes[i].opcode = OpCodes.Ldc_I4_4;
-                    break;
-                }
-            }
-            return codes.AsEnumerable();
+            SteamMatchmaking.SetLobbyJoinable(__instance.CurrentLobby, true);
         }
     }
 }
