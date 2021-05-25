@@ -51,6 +51,28 @@ namespace FFAMod
             return codes.AsEnumerable();
         }
 
+        [HarmonyPatch("Update")]
+        private static void Postfix(ref int ___playersNeededToStart)
+        {
+            var players = PlayerManager.instance.players;
+            if (Input.GetKey(KeyCode.Alpha3))
+            {
+                ___playersNeededToStart = 3;
+                PlayerAssigner.instance.maxPlayers = ___playersNeededToStart;
+                UnityEngine.Debug.Log("Max players: " + PlayerAssigner.instance.maxPlayers);
+                SoundPlayerStatic.Instance.PlayButtonClick();
+                if (players.Count > 0)
+                    instance.PlayerJoined(players[0]);
+            }
+            if (Input.GetKey(KeyCode.Alpha2) || Input.GetKey(KeyCode.Alpha4))
+            {
+                UnityEngine.Debug.Log("Max players: " + PlayerAssigner.instance.maxPlayers);
+                SoundPlayerStatic.Instance.PlayButtonClick();
+                if (players.Count > 0)
+                    instance.PlayerJoined(players[0]);
+            }
+        }
+
         [HarmonyPatch("PlayerJoined")]
         private static bool Prefix(Player player, int ___playersNeededToStart)
         {
