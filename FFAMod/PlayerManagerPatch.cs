@@ -8,6 +8,15 @@ namespace FFAMod
     [HarmonyPatch(typeof(PlayerManager))]
     internal class PlayerManagerPatch : PlayerManager
     {
+        [HarmonyPatch("GetOtherPlayer")]
+        private static void Postfix(ref Player __result, Player asker)
+        {
+            if (__result == asker)
+            {
+                __result = null;
+            }
+        }
+
         public static int GetOtherTeamPatch(int team, int offset = 1)
         {
             int[] array;

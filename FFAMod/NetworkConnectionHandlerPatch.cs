@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Steamworks;
-using Landfall.Network;
+using SoundImplementation;
+using Photon.Pun;
+using UnityEngine;
 
 namespace FFAMod
 {
@@ -26,16 +27,43 @@ namespace FFAMod
             }
             return codes.AsEnumerable();
         }
-    }
 
-    [HarmonyPatch(typeof(ClientSteamLobby))]
-    internal class ClientSteamLobbyPatch
-    {
-
-        [HarmonyPatch("HideLobby")]
-        private static void Postfix(ClientSteamLobby __instance)
+        [HarmonyPatch("OnPlayerEnteredRoom")]
+        private static bool Prefix(NetworkConnectionHandler __instance, Photon.Realtime.Player newPlayer)
         {
-            SteamMatchmaking.SetLobbyJoinable(__instance.CurrentLobby, true);
+            if (PhotonNetwork.PlayerList.Length >= playersNeededToStart)
+            {
+                return true;
+            }
+            else
+            {
+                SoundPlayerStatic.Instance.PlayPlayerAdded();
+                Debug.Log("PlayerJoined");
+                __instance.OnPlayerEnteredRoom(newPlayer);
+                return false;
+            }
         }
+
+        [HarmonyPatch("Update")]
+        private static void Postfix()
+        {
+            if (Input.GetKey(KeyCode.Alpha4))
+            {
+                playersNeededToStart = 4;
+                SoundPlayerStatic.Instance.PlayButtonClick();
+            }
+            if (Input.GetKey(KeyCode.Alpha3))
+            {
+                playersNeededToStart = 3;
+                SoundPlayerStatic.Instance.PlayButtonClick();
+            }
+            if (Input.GetKey(KeyCode.Alpha2))
+            {
+                playersNeededToStart = 2;
+                SoundPlayerStatic.Instance.PlayButtonClick();
+            }
+        }
+
+        private static int playersNeededToStart = 4;
     }
 }

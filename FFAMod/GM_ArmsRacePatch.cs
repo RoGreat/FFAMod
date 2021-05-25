@@ -1,12 +1,7 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
 using SoundImplementation;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 using UnityEngine;
 
 namespace FFAMod
@@ -31,46 +26,6 @@ namespace FFAMod
             p4Rounds = 0;
             winningTeamID = -1;
             losingTeamID = -1;
-        }
-
-        [HarmonyPatch("Start")]
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            var codes = instructions.ToList();
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (codes[i].opcode == OpCodes.Stfld && codes[i].operand is FieldInfo && (codes[i].operand as FieldInfo) == AccessTools.Field(typeof(GM_ArmsRace), "playersNeededToStart"))
-                {
-                    if (codes[i - 1].opcode == OpCodes.Ldc_I4_2)
-                    {
-                        codes[i - 1].opcode = OpCodes.Ldc_I4_4;
-                        break;
-                    }
-                }
-            }
-            return codes.AsEnumerable();
-        }
-
-        [HarmonyPatch("Update")]
-        private static void Postfix(ref int ___playersNeededToStart)
-        {
-            var players = PlayerManager.instance.players;
-            if (Input.GetKey(KeyCode.Alpha3))
-            {
-                ___playersNeededToStart = 3;
-                PlayerAssigner.instance.maxPlayers = ___playersNeededToStart;
-                UnityEngine.Debug.Log("Max players: " + PlayerAssigner.instance.maxPlayers);
-                SoundPlayerStatic.Instance.PlayButtonClick();
-                if (players.Count > 0)
-                    instance.PlayerJoined(players[0]);
-            }
-            if (Input.GetKey(KeyCode.Alpha2) || Input.GetKey(KeyCode.Alpha4))
-            {
-                UnityEngine.Debug.Log("Max players: " + PlayerAssigner.instance.maxPlayers);
-                SoundPlayerStatic.Instance.PlayButtonClick();
-                if (players.Count > 0)
-                    instance.PlayerJoined(players[0]);
-            }
         }
 
         [HarmonyPatch("PlayerJoined")]
