@@ -63,6 +63,7 @@
     </Reference>
     <Reference Include="System">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\System.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\Unity.TextMeshPro.dll</HintPath>
@@ -78,6 +79,7 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
