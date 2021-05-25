@@ -18,7 +18,7 @@ namespace FFAMod
         private static int pointsToWinRound = 2;
 
         [HarmonyPatch("Start")]
-        private static void Prefix()
+        private static void Postfix()
         {
             p3Points = 0;
             p4Points = 0;
@@ -26,10 +26,11 @@ namespace FFAMod
             p4Rounds = 0;
             winningTeamID = -1;
             losingTeamID = -1;
+            PlayerAssigner.instance.maxPlayers = NetworkConnectionHandlerPatch.PlayersNeededToStart;
         }
 
         [HarmonyPatch("PlayerJoined")]
-        private static bool Prefix(Player player, int ___playersNeededToStart)
+        private static bool Prefix(Player player)
         {
             if (PhotonNetwork.OfflineMode)
             {
@@ -48,7 +49,7 @@ namespace FFAMod
                 }
             }
             player.data.isPlaying = false;
-            if (count >= ___playersNeededToStart)
+            if (count >= NetworkConnectionHandlerPatch.PlayersNeededToStart)
             {
                 instance.StartGame();
             }

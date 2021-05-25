@@ -13,6 +13,8 @@ namespace FFAMod
     [HarmonyPatch(typeof(NetworkConnectionHandler))]
     internal class NetworkConnectionHandlerPatch
     {
+        public static int PlayersNeededToStart = 4;
+
         [HarmonyPatch("HostPrivateAndInviteFriend")]
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
@@ -31,7 +33,7 @@ namespace FFAMod
         [HarmonyPatch("OnPlayerEnteredRoom")]
         private static bool Prefix(NetworkConnectionHandler __instance, Photon.Realtime.Player newPlayer)
         {
-            if (PhotonNetwork.PlayerList.Length >= playersNeededToStart)
+            if (PhotonNetwork.PlayerList.Length >= PlayersNeededToStart)
             {
                 return true;
             }
@@ -49,21 +51,19 @@ namespace FFAMod
         {
             if (Input.GetKey(KeyCode.Alpha4))
             {
-                playersNeededToStart = 4;
+                PlayersNeededToStart = 4;
                 SoundPlayerStatic.Instance.PlayButtonClick();
             }
             if (Input.GetKey(KeyCode.Alpha3))
             {
-                playersNeededToStart = 3;
+                PlayersNeededToStart = 3;
                 SoundPlayerStatic.Instance.PlayButtonClick();
             }
             if (Input.GetKey(KeyCode.Alpha2))
             {
-                playersNeededToStart = 2;
+                PlayersNeededToStart = 2;
                 SoundPlayerStatic.Instance.PlayButtonClick();
             }
         }
-
-        private static int playersNeededToStart = 4;
     }
 }

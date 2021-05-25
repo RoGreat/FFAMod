@@ -24,13 +24,16 @@ namespace FFAMod
         private static bool Prefix(int[] actorIDs, ref Player ___playerToUpgrade, ApplyCardStats __instance)
         {
             // Have to skip AddCard for now
-            if (actorIDs[0] > 1)
+            for (int i = 0; i < actorIDs.Length; i++)
             {
-                Player actorID = (Player)AccessTools.Method(typeof(PlayerManager), "GetPlayerWithActorID").Invoke(PlayerManager.instance, new object[] { actorIDs[0] });
-                ___playerToUpgrade = actorID;
-                AccessTools.Method(typeof(ApplyCardStats), "ApplyStats").Invoke(__instance, null);
-                CardBarPatch.play = true;
-                return false;
+                Player playerActorID = (Player)AccessTools.Method(typeof(PlayerManager), "GetPlayerWithActorID").Invoke(PlayerManager.instance, new object[] { actorIDs[i] });
+                if (playerActorID.teamID > 1)
+                {
+                    ___playerToUpgrade = playerActorID;
+                    AccessTools.Method(typeof(ApplyCardStats), "ApplyStats").Invoke(__instance, null);
+                    CardBarPatch.play = true;
+                    return false;
+                }
             }
             return true;
         }
