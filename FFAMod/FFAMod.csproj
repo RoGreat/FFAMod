@@ -49,22 +49,22 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\netstandard.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PhotonRealtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PhotonRealtime">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\PhotonRealtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PhotonUnityNetworking, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PhotonUnityNetworking">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\PhotonUnityNetworking.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SonigonAudioEngine.Runtime">
-      <HintPath>D:\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\SonigonAudioEngine.Runtime.dll</HintPath>
+      <HintPath>$(GameFolder)\Rounds_Data\Managed\SonigonAudioEngine.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
-      <HintPath>D:\SteamLibrary\steamapps\common\ROUNDS\Rounds_Data\Managed\System.dll</HintPath>
+      <HintPath>$(GameFolder)\Rounds_Data\Managed\System.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Unity.TextMeshPro">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -72,9 +72,12 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

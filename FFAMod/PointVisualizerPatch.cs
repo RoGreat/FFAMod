@@ -10,6 +10,14 @@ namespace FFAMod
         {
             if (GM_ArmsRacePatch.winningTeamID == 2)
             {
+                instance.text.color = PlayerSkinBank.GetPlayerSkinColors(2).winText;
+            }
+            else if (GM_ArmsRacePatch.winningTeamID == 3)
+            {
+                instance.text.color = PlayerSkinBank.GetPlayerSkinColors(3).winText;
+            }
+            if (GM_ArmsRacePatch.winningTeamID == 2)
+            {
                 if (GM_ArmsRacePatch.p3Points == 1)
                 {
                     HalfRed();
