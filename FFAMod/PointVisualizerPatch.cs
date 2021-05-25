@@ -10,22 +10,22 @@ namespace FFAMod
         {
             if (GM_ArmsRacePatch.winningTeamID == 2)
             {
-                if (GM_ArmsRacePatch.p3Points > 1)
+                if (GM_ArmsRacePatch.p3Points == 1)
                 {
-                    RoundRed();
+                    HalfRed();
                     return;
                 }
-                HalfRed();
+                RoundRed();
                 return;
             }
             else if (GM_ArmsRacePatch.winningTeamID == 3)
             {
-                if (GM_ArmsRacePatch.p4Points > 1)
+                if (GM_ArmsRacePatch.p4Points == 1)
                 {
-                    RoundGreen();
+                    HalfGreen();
                     return;
                 }
-                HalfGreen();
+                RoundGreen();
                 return;
             }
         }

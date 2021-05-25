@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Photon.Pun;
 using SoundImplementation;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,11 @@ namespace FFAMod
         public static int p4Rounds;
         public static int winningTeamID = -1;
         private static int losingTeamID = -1;
-        private static bool isReady;
+        private static int pointsToWinRound = 2;
 
         [HarmonyPatch("Start")]
         private static void Prefix()
         {
-            isReady = false;
             p3Points = 0;
             p4Points = 0;
             p3Rounds = 0;
@@ -51,50 +51,6 @@ namespace FFAMod
             return codes.AsEnumerable();
         }
 
-        [HarmonyPatch("Update")]
-        private static void Postfix()
-        {
-            if (!PhotonNetwork.OfflineMode && !GameManager.instance.isPlaying)
-            {
-                int count = PlayerManager.instance.players.Count;
-                if (count >= 2)
-                {
-                    for (int i = 0; i < count; i++)
-                    {
-                        Player player = PlayerManager.instance.players[i];
-                        instance.StartCoroutine(WaitToStart(player));
-                    }
-                }
-            }
-        }
-
-        private static IEnumerator WaitToStart(Player player)
-        {
-            if (player.data.view.IsMine && player.data.isPlaying == false)
-            {
-                yield return new WaitForSeconds(0.1f);
-                if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
-                {
-                    if (Input.GetKeyDown(KeyCode.Space))
-                    {
-                        isReady = true;
-                    }
-                }
-                else if (player.data.playerActions.Device.CommandWasPressed)
-                {
-                    isReady = true;
-                }
-            }
-            if (isReady)
-            {
-                var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
-                yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
-                instance.StartGame();
-                isReady = false;
-            }
-            yield break;
-        }
-
         [HarmonyPatch("PlayerJoined")]
         private static bool Prefix(Player player, int ___playersNeededToStart)
         {
@@ -107,20 +63,7 @@ namespace FFAMod
             {
                 if (player.data.view.IsMine)
                 {
-                    if (___playersNeededToStart - count == 2)
-                    {
-                        if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
-                            UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [SPACE] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                        else
-                            UIHandler.instance.ShowJoinGameText("TWO MORE PLAYERS CAN JOIN\n PRESS [START] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                    }
-                    else if (___playersNeededToStart - count == 1)
-                    {
-                        if (player.data.input.inputType == GeneralInput.InputType.Keyboard)
-                            UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [SPACE] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                        else
-                            UIHandler.instance.ShowJoinGameText("ONE MORE PLAYER CAN JOIN\n PRESS [START] TO READY UP", PlayerSkinBank.GetPlayerSkinColors(count).winText);
-                    }
+                    UIHandler.instance.ShowJoinGameText("WAITING", PlayerSkinBank.GetPlayerSkinColors(count).winText);
                 }
                 else
                 {
@@ -199,7 +142,7 @@ namespace FFAMod
         }
 
         [HarmonyPatch("RPCA_NextRound")]
-        private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning)
+        private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning, int ___pointsToWinRound)
         {
             int losingTeamID2 = -1;
             int losingTeamID3 = -1;
@@ -215,6 +158,7 @@ namespace FFAMod
             }
             GM_ArmsRacePatch.losingTeamID = losingTeamID;
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
+            pointsToWinRound = ___pointsToWinRound;
             Debug.Log("Losing team: " + losingTeamID);
             Debug.Log("Winning team: " + winningTeamID);
             if (___isTransitioning)
@@ -251,11 +195,10 @@ namespace FFAMod
 
         private static void Points(ref int points, ref int rounds)
         {
-            int pointsToWinRound = (int)AccessTools.Field(typeof(GM_ArmsRace), "pointsToWinRound").GetValue(instance);
-            ++points;
+            points++;
             if (points >= pointsToWinRound)
             {
-                ++rounds;
+                rounds++;
                 if (rounds >= instance.roundsToWinGame)
                 {
                     Debug.Log("Game over, winning team: " + winningTeamID);
@@ -288,8 +231,8 @@ namespace FFAMod
         private static IEnumerator RoundTransition(int winningTeamID, int losingTeamID)
         {
             GM_ArmsRace gmArmsRace = instance;
-            var SetPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
-            var WaitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
+            var setPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
+            var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
             gmArmsRace.StartCoroutine(PointVisualizer.instance.DoWinSequence(gmArmsRace.p1Points, gmArmsRace.p2Points, gmArmsRace.p1Rounds, gmArmsRace.p2Rounds, winningTeamID == 0));
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
@@ -300,14 +243,14 @@ namespace FFAMod
             {
                 Debug.Log("PICK PHASE");
                 // PlayerManager.instance.SetPlayersVisible(false);
-                SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
+                setPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
                 for (int i = 0; i < PlayerManager.instance.players.Count; i++)
                 {
                     Player player = PlayerManager.instance.players[i];
                     if (player.teamID != winningTeamID)
                     {
                         // yield return gmArmsRace.StartCoroutine(gmArmsRace.WaitForSyncUp());
-                        yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
+                        yield return gmArmsRace.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(gmArmsRace, null));
                         CardChoiceVisuals.instance.Show(i, true);
                         if (player.GetComponent<PlayerAPI>().enabled == true)
                         {
@@ -320,9 +263,9 @@ namespace FFAMod
                     }
                 }
                 // PlayerManager.instance.SetPlayersVisible(true);
-                SetPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
+                setPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
             }
-            yield return gmArmsRace.StartCoroutine((IEnumerator)WaitForSyncUp.Invoke(gmArmsRace, null));
+            yield return gmArmsRace.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(gmArmsRace, null));
             CardChoiceVisuals.instance.Hide();
             TimeHandler.instance.DoSlowDown();
             MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);

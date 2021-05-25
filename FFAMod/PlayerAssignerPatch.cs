@@ -24,13 +24,21 @@ namespace FFAMod
             return false;
         }
 
+        // AI bugs out when battle is going
+        [HarmonyPatch("LateUpdate")]
+        private static bool Prefix()
+        {
+            if (GameManager.instance.battleOngoing)
+                return false;
+            return true;
+        }
+
         [HarmonyPatch("CreatePlayer")]
         private static bool Prefix(ref IEnumerator __result, InputDevice inputDevice, bool isAI = false)
         {
             __result = CreatePlayerPatch(inputDevice, isAI);
             return false;
         }
-
         private static IEnumerator CreatePlayerPatch(InputDevice inputDevice, bool isAI = false)
         {
             PlayerAssigner playerAssigner = instance;
@@ -97,36 +105,5 @@ namespace FFAMod
             }
             yield break;
         }
-
-        /*
-        [HarmonyTranspiler]
-        [HarmonyPatch("RPCM_RequestTeamAndPlayerID")]
-        private static IEnumerable<CodeInstruction> RPCM_RequestTeamAndPlayerIDTranspiler(IEnumerable<CodeInstruction> instructions)
-        {
-            var codes = instructions.ToList();
-            int startIndex = -1;
-            int endIndex = -1;
-            int stage = 0;
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (stage == 0 && codes[i].opcode == OpCodes.Ldloc_0)
-                {
-                    startIndex = i + 1;
-                    stage++;
-                }
-                if (stage == 1 && codes[i].opcode == OpCodes.Stloc_1)
-                {
-                    endIndex = i;
-                    break;
-                }
-            }
-            if (startIndex > -1 && endIndex > -1)
-            {
-                codes[startIndex].opcode = OpCodes.Nop;
-                codes.RemoveRange(startIndex + 1, endIndex - startIndex - 1);
-            }
-            return codes.AsEnumerable();
-        }
-        */
     }
 }
