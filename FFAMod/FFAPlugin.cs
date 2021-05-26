@@ -8,8 +8,11 @@ namespace FFAMod
     [BepInProcess("Rounds.exe")]
     public class FFAPlugin : BaseUnityPlugin
     {
+        public static FFAPlugin instance;
+
         private void Start()
         {
+            instance = this;
             var harmony = new Harmony("mod.rounds.all.for.free");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             Logger.LogInfo("Free For All Mod Loaded");

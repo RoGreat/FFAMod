@@ -3,29 +3,29 @@ using Photon.Pun;
 using SoundImplementation;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FFAMod
 {
     [HarmonyPatch(typeof(GM_ArmsRace))]
     internal class GM_ArmsRacePatch : GM_ArmsRace
     {
-        public static int p3Points;
-        public static int p4Points;
-        public static int p3Rounds;
-        public static int p4Rounds;
-        public static int winningTeamID = -1;
-        private static int losingTeamID = -1;
-        private static int pointsToWinRound = 2;
+        public static int P3Points;
+        public static int P4Points;
+        public static int P3Rounds;
+        public static int P4Rounds;
+        public static int WinningTeamID;
+        public static int LosingTeamID;
+
+        private static int pointsToWinRound;
 
         [HarmonyPatch("Start")]
         private static void Postfix()
         {
-            p3Points = 0;
-            p4Points = 0;
-            p3Rounds = 0;
-            p4Rounds = 0;
-            winningTeamID = -1;
-            losingTeamID = -1;
+            P3Points = 0;
+            P4Points = 0;
+            P3Rounds = 0;
+            P4Rounds = 0;
             PlayerAssigner.instance.maxPlayers = NetworkConnectionHandlerPatch.PlayersNeededToStart;
         }
 
@@ -86,7 +86,12 @@ namespace FFAMod
                     if (player.GetComponent<PlayerAPI>().enabled == true)
                     {
                         AIPick(player);
+                        yield return new WaitForSecondsRealtime(1f);
+                       CardChoice.instance.StartCoroutine(CardChoice.instance.IDoEndPick(currentCard));
+                        UIHandler.instance.StopShowPicker();
+                        CardChoiceVisuals.instance.Hide();
                         yield return new WaitForSecondsRealtime(0.3f);
+                        Destroy(currentCard);
                     }
                     else
                         yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Team);
@@ -106,7 +111,7 @@ namespace FFAMod
         }
 
         [HarmonyPatch("PlayerDied")]
-        private static bool Prefix(Player killedPlayer, int playersAlive, PhotonView ___view)
+        private static bool Prefix(Player killedPlayer, PhotonView ___view)
         {
             if (!PhotonNetwork.OfflineMode)
                 Debug.Log("PlayerDied: " + killedPlayer.data.view.Owner.NickName);
@@ -134,8 +139,8 @@ namespace FFAMod
                 losingTeamID3 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 3);
                 Debug.Log("Losing team: " + losingTeamID3);
             }
-            GM_ArmsRacePatch.losingTeamID = losingTeamID;
-            GM_ArmsRacePatch.winningTeamID = winningTeamID;
+            LosingTeamID = losingTeamID;
+            WinningTeamID = winningTeamID;
             pointsToWinRound = ___pointsToWinRound;
             Debug.Log("Losing team: " + losingTeamID);
             Debug.Log("Winning team: " + winningTeamID);
@@ -162,10 +167,10 @@ namespace FFAMod
                     Points(ref instance.p2Points, ref instance.p2Rounds);
                     break;
                 case 2:
-                    Points(ref p3Points, ref p3Rounds);
+                    Points(ref P3Points, ref P3Rounds);
                     break;
                 default:
-                    Points(ref p4Points, ref p4Rounds);
+                    Points(ref P4Points, ref P4Rounds);
                     break;
             }
             return false;
@@ -179,34 +184,34 @@ namespace FFAMod
                 rounds++;
                 if (rounds >= instance.roundsToWinGame)
                 {
-                    Debug.Log("Game over, winning team: " + winningTeamID);
+                    Debug.Log("Game over, winning team: " + WinningTeamID);
                     // GameOver(winningTeamID);
-                    AccessTools.Method(typeof(GM_ArmsRace), "GameOver").Invoke(instance, new object[] { winningTeamID });
+                    AccessTools.Method(typeof(GM_ArmsRace), "GameOver").Invoke(instance, new object[] { WinningTeamID });
                     instance.pointOverAction();
                     return;
                 }
-                Debug.Log("Round over, winning team: " + winningTeamID);
-                RoundOver(winningTeamID, losingTeamID);
+                Debug.Log("Round over, winning team: " + WinningTeamID);
+                RoundOver(WinningTeamID);
                 instance.pointOverAction();
                 return;
             }
-            Debug.Log("Point over, winning team: " + winningTeamID);
-            PointOver(winningTeamID);
+            Debug.Log("Point over, winning team: " + WinningTeamID);
+            PointOver(WinningTeamID);
             instance.pointOverAction();
         }
 
-        private static void RoundOver(int winningTeamID, int losingTeamID)
+        private static void RoundOver(int winningTeamID)
         {
             // this.currentWinningTeamID = winningTeamID;
             AccessTools.Field(typeof(GM_ArmsRace), "currentWinningTeamID").SetValue(instance, winningTeamID);
-            instance.StartCoroutine(RoundTransition(winningTeamID, losingTeamID));
+            instance.StartCoroutine(RoundTransition(winningTeamID));
             instance.p1Points = 0;
             instance.p2Points = 0;
-            p3Points = 0;
-            p4Points = 0;
+            P3Points = 0;
+            P4Points = 0;
         }
 
-        private static IEnumerator RoundTransition(int winningTeamID, int losingTeamID)
+        private static IEnumerator RoundTransition(int winningTeamID)
         {
             GM_ArmsRace gmArmsRace = instance;
             var setPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
@@ -233,7 +238,12 @@ namespace FFAMod
                         if (player.GetComponent<PlayerAPI>().enabled == true)
                         {
                             AIPick(player);
+                            yield return new WaitForSecondsRealtime(1f);
+                            CardChoice.instance.StartCoroutine(CardChoice.instance.IDoEndPick(currentCard));
+                            UIHandler.instance.StopShowPicker();
+                            CardChoiceVisuals.instance.Hide();
                             yield return new WaitForSecondsRealtime(0.3f);
+                            Destroy(currentCard);
                         }
                         else if (player.teamID != winningTeamID)
                             yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
@@ -287,13 +297,21 @@ namespace FFAMod
             var getRanomCardMethod = AccessTools.Method(typeof(CardChoice), "GetRanomCard");
             var getRanomCard = (GameObject)getRanomCardMethod.Invoke(CardChoice.instance, null);
             getRanomCard.GetComponent<CardInfo>().sourceCard = getRanomCard.GetComponent<CardInfo>();
+            // // CardBar
+            var children = (Transform[])AccessTools.Field(typeof(CardChoice), "children").GetValue(CardChoice.instance);
+            currentCard = CardChoice.instance.AddCardVisual(getRanomCard.GetComponent<CardInfo>().sourceCard, children[0].transform.position);
+            currentCard.GetComponentInChildren<Canvas>().sortingLayerName = "MostFront";
+            currentCard.GetComponentInChildren<GraphicRaycaster>().enabled = false;
+            currentCard.GetComponentInChildren<SetScaleToZero>().enabled = false;
+            currentCard.GetComponentInChildren<SetScaleToZero>().transform.localScale = Vector3.one * 1.15f;
+            // // ApplyCardStats
             getRanomCard.transform.root.GetComponentInChildren<ApplyCardStats>().Pick(CardChoice.instance.pickrID, true);
             CardChoice.instance.pickrID = -1;
             var setCurrentSelected = AccessTools.Method(typeof(CardChoiceVisuals), "SetCurrentSelected");
             // CardChoiceVisuals.instance.SetCurrentSelected(this.currentlySelectedCard);
             setCurrentSelected.Invoke(CardChoiceVisuals.instance, new object[] { 0 });
-            UIHandler.instance.StopShowPicker();
-            CardChoiceVisuals.instance.Hide();
         }
+
+        private static GameObject currentCard;
     }
 }

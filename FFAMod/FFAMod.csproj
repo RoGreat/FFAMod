@@ -85,6 +85,10 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+		<Reference Include="UnityEngine.UIModule">
+      <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharacterSelectionInstancePatch.cs" />
