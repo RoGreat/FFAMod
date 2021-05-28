@@ -124,7 +124,7 @@ namespace FFAMod
         private static bool Prefix(Player killedPlayer, PhotonView ___view)
         {
             if (!PhotonNetwork.OfflineMode)
-                Debug.Log("PlayerDied: " + killedPlayer.data.view.Owner.NickName);
+                UnityEngine.Debug.Log("PlayerDied: " + killedPlayer.data.view.Owner.NickName);
             if (PlayerManagerPatch.TeamsAlivePatch() >= 2)
                 return false;
             TimeHandler.instance.DoSlowDown();
@@ -142,17 +142,17 @@ namespace FFAMod
             if (PlayerManager.instance.players.Count >= 3)
             {
                 losingTeamID2 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 2);
-                Debug.Log("Losing team: " + losingTeamID2);
+                UnityEngine.Debug.Log("Losing team: " + losingTeamID2);
             }
             if (PlayerManager.instance.players.Count == 4)
             {
                 losingTeamID3 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 3);
-                Debug.Log("Losing team: " + losingTeamID3);
+                UnityEngine.Debug.Log("Losing team: " + losingTeamID3);
             }
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
             pointsToWinRound = ___pointsToWinRound;
-            Debug.Log("Losing team: " + losingTeamID);
-            Debug.Log("Winning team: " + winningTeamID);
+            UnityEngine.Debug.Log("Losing team: " + losingTeamID);
+            UnityEngine.Debug.Log("Winning team: " + winningTeamID);
             if (___isTransitioning)
                 return false;
             GameManager.instance.battleOngoing = false;
@@ -193,18 +193,18 @@ namespace FFAMod
                 rounds++;
                 if (rounds >= instance.roundsToWinGame)
                 {
-                    Debug.Log("Game over, winning team: " + winningTeamID);
+                    UnityEngine.Debug.Log("Game over, winning team: " + winningTeamID);
                     // GameOver(winningTeamID);
                     AccessTools.Method(typeof(GM_ArmsRace), "GameOver").Invoke(instance, new object[] { winningTeamID });
                     instance.pointOverAction();
                     return;
                 }
-                Debug.Log("Round over, winning team: " + winningTeamID);
+                UnityEngine.Debug.Log("Round over, winning team: " + winningTeamID);
                 RoundOver(winningTeamID);
                 instance.pointOverAction();
                 return;
             }
-            Debug.Log("Point over, winning team: " + winningTeamID);
+            UnityEngine.Debug.Log("Point over, winning team: " + winningTeamID);
             PointOver(winningTeamID);
             instance.pointOverAction();
         }
@@ -233,7 +233,7 @@ namespace FFAMod
             TimeHandler.instance.DoSpeedUp();
             if (gmArmsRace.pickPhase)
             {
-                Debug.Log("PICK PHASE");
+                UnityEngine.Debug.Log("PICK PHASE");
                 // PlayerManager.instance.SetPlayersVisible(false);
                 setPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
                 for (int i = 0; i < PlayerManager.instance.players.Count; i++)

@@ -40,7 +40,7 @@ namespace FFAMod
         private static bool Prefix(RoomOptions roomOptions, ClientSteamLobby ___m_SteamLobby)
         {
             roomOptions.MaxPlayers = (byte)PlayersNeededToStart;
-            Debug.Log("roomOptions MaxPlayers " + roomOptions.MaxPlayers);
+            UnityEngine.Debug.Log("roomOptions MaxPlayers " + roomOptions.MaxPlayers);
             ___m_SteamLobby.CreateLobby(roomOptions.MaxPlayers, delegate (string RoomName)
             {
                 PhotonNetwork.CreateRoom(RoomName, roomOptions, null, null);
@@ -53,7 +53,7 @@ namespace FFAMod
         {
             SoundPlayerStatic.Instance.PlayPlayerAdded();
             PlayersNeededToStart = PhotonNetwork.CurrentRoom.MaxPlayers;
-            Debug.Log("CurrentRoom MaxPlayers " + PlayersNeededToStart);
+            UnityEngine.Debug.Log("CurrentRoom MaxPlayers " + PlayersNeededToStart);
             if (PhotonNetwork.PlayerList.Length == PlayersNeededToStart)
             {
                 if (PhotonNetwork.IsMasterClient)
@@ -65,7 +65,7 @@ namespace FFAMod
                     ___m_SteamLobby.HideLobby();
                 }
             }
-            Debug.Log("PlayerJoined");
+            UnityEngine.Debug.Log("PlayerJoined");
             instance.OnPlayerEnteredRoom(newPlayer);
             return false;
         }
@@ -104,7 +104,7 @@ namespace FFAMod
             else
             {
                 SoundPlayerStatic.Instance.PlayPlayerAdded();
-                Debug.Log("PlayerJoined");
+                UnityEngine.Debug.Log("PlayerJoined");
                 __instance.OnPlayerEnteredRoom(newPlayer);
                 return false;
             }
@@ -146,7 +146,7 @@ namespace FFAMod
                 if (enterRoomParams.RoomOptions != null)
                 {
                     NetworkConnectionHandlerPatch.PlayersNeededToStart = enterRoomParams.RoomOptions.MaxPlayers;
-                    Debug.Log("OpJoinRoom max players set to: " + enterRoomParams.RoomOptions.MaxPlayers);
+                    UnityEngine.Debug.Log("OpJoinRoom max players set to: " + enterRoomParams.RoomOptions.MaxPlayers);
                 }
             }
         }

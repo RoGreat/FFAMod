@@ -8,13 +8,10 @@ namespace FFAMod
     [HarmonyPatch(typeof(PlayerManager))]
     internal class PlayerManagerPatch : PlayerManager
     {
-        [HarmonyPatch("GetOtherPlayer")]
-        private static void Postfix(ref Player __result, Player asker)
+        [HarmonyPatch("GetOtherTeam")]
+        private static void Postfix(ref int __result, int team)
         {
-            if (__result == asker)
-            {
-                __result = null;
-            }
+            __result = team;
         }
 
         public static int GetOtherTeamPatch(int team, int offset = 1)
@@ -30,25 +27,24 @@ namespace FFAMod
         }
 
         [HarmonyPatch("GetClosestPlayerInTeam")]
-        private static bool Prefix(ref Player __result, Vector3 position, int team, bool needVision = false)
+        private static bool Prefix(ref Player __result, Vector3 position, int team, bool needVision)
         {
             __result = GetClosestPlayerInTeamPatch(position, team, needVision);
             return false;
         }
-        private static Player GetClosestPlayerInTeamPatch(Vector3 position, int team, bool needVision = false)
+        private static Player GetClosestPlayerInTeamPatch(Vector3 position, int team, bool needVision)
         {
             Player result = null;
-            bool isTransitioning = (bool)AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").GetValue(GM_ArmsRace.instance);
-            if (isTransitioning)
-                return result;
             Player[] players = instance.players.ToArray();
             float num = float.MaxValue;
             float num2 = 0;
             var dictionary = new Dictionary<int, float>();
             for (int i = 0; i < players.Length; i++)
             {
+                if (players[i].teamID == team)
+                    continue;
                 num2 = Vector2.Distance(position, players[i].transform.position);
-                if (!players[i].data.dead && num2 > 0)
+                if (!players[i].data.dead)
                     dictionary.Add(i, num2);
             }
             if (dictionary.Count == 0)
