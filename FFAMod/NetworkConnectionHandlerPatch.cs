@@ -8,11 +8,13 @@ using SoundImplementation;
 using Photon.Pun;
 using UnityEngine;
 using Landfall.Network;
+using System;
+using System.Collections;
 
 namespace FFAMod
 {
     [HarmonyPatch(typeof(NetworkConnectionHandler))]
-    internal class NetworkConnectionHandlerPatch
+    internal class NetworkConnectionHandlerPatch : NetworkConnectionHandler
     {
         public static int PlayersNeededToStart = 4;
 
@@ -34,16 +36,41 @@ namespace FFAMod
         }
         */
 
-        private static RoomOptions options;
-
         [HarmonyPatch("CreateRoom")]
-        private static void Prefix(ref RoomOptions roomOptions)
+        private static bool Prefix(RoomOptions roomOptions, ClientSteamLobby ___m_SteamLobby)
         {
-            options = roomOptions;
-            options.MaxPlayers = (byte)PlayersNeededToStart;
-            Debug.Log("CreateRoom set max players: " + roomOptions.MaxPlayers);
+            roomOptions.MaxPlayers = (byte)PlayersNeededToStart;
+            Debug.Log("roomOptions MaxPlayers " + roomOptions.MaxPlayers);
+            ___m_SteamLobby.CreateLobby(roomOptions.MaxPlayers, delegate (string RoomName)
+            {
+                PhotonNetwork.CreateRoom(RoomName, roomOptions, null, null);
+            });
+            return false;
         }
 
+        [HarmonyPatch("OnPlayerEnteredRoom")]
+        private static bool Prefix(Photon.Realtime.Player newPlayer, ClientSteamLobby ___m_SteamLobby)
+        {
+            SoundPlayerStatic.Instance.PlayPlayerAdded();
+            PlayersNeededToStart = PhotonNetwork.CurrentRoom.MaxPlayers;
+            Debug.Log("CurrentRoom MaxPlayers " + PlayersNeededToStart);
+            if (PhotonNetwork.PlayerList.Length == PlayersNeededToStart)
+            {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    instance.GetComponent<PhotonView>().RPC("RPCA_FoundGame", RpcTarget.All, new object[] { });
+                }
+                if (___m_SteamLobby != null)
+                {
+                    ___m_SteamLobby.HideLobby();
+                }
+            }
+            Debug.Log("PlayerJoined");
+            instance.OnPlayerEnteredRoom(newPlayer);
+            return false;
+        }
+
+        /*
         [HarmonyTranspiler]
         [HarmonyPatch("OnPlayerEnteredRoom")]
         private static IEnumerable<CodeInstruction> OnPlayerEnteredRoomTranspiler(IEnumerable<CodeInstruction> instructions)
@@ -64,11 +91,13 @@ namespace FFAMod
             }
             return codes.AsEnumerable();
         }
+        */
 
+        /*
         [HarmonyPatch("OnPlayerEnteredRoom")]
         private static bool Prefix(NetworkConnectionHandler __instance, Photon.Realtime.Player newPlayer)
         {
-            if (PhotonNetwork.PlayerList.Length >= PlayersNeededToStart)
+            if (PhotonNetwork.PlayerList.Length >= PhotonNetwork.CurrentRoom.MaxPlayers)
             {
                 return true;
             }
@@ -80,50 +109,49 @@ namespace FFAMod
                 return false;
             }
         }
+        */
 
         [HarmonyPatch("Update")]
         private static void Postfix()
         {
-            if (!PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
-                return;
-            if (Input.GetKey(KeyCode.Alpha4))
-            {
-                PlayersNeededToStart = 4;
-                SoundPlayerStatic.Instance.PlayButtonClick();
-            }
-            if (Input.GetKey(KeyCode.Alpha3))
-            {
-                PlayersNeededToStart = 3;
-                SoundPlayerStatic.Instance.PlayButtonClick();
-            }
-            if (Input.GetKey(KeyCode.Alpha2))
-            {
-                PlayersNeededToStart = 2;
-                SoundPlayerStatic.Instance.PlayButtonClick();
-            }
             if (PhotonNetwork.IsMasterClient)
             {
-                if (options != null)
+                if (Input.GetKey(KeyCode.Alpha4))
                 {
-                    if (options.MaxPlayers != (byte)PlayersNeededToStart)
-                    {
-                        options.MaxPlayers = (byte)PlayersNeededToStart;
-                        Debug.Log("Update set max players: " + options.MaxPlayers);
-                    }
+                    PlayersNeededToStart = 4;
+                    SoundPlayerStatic.Instance.PlayButtonClick();
+                }
+                if (Input.GetKey(KeyCode.Alpha3))
+                {
+                    PlayersNeededToStart = 3;
+                    SoundPlayerStatic.Instance.PlayButtonClick();
+                }
+                if (Input.GetKey(KeyCode.Alpha2))
+                {
+                    PlayersNeededToStart = 2;
+                    SoundPlayerStatic.Instance.PlayButtonClick();
                 }
             }
         }
     }
-
+    /*
     [HarmonyPatch(typeof(LoadBalancingClient))]
     internal class LoadBalancingClientPatch
     {
         [HarmonyPatch("OpJoinRoom")]
         private static void Prefix(EnterRoomParams enterRoomParams)
         {
-            NetworkConnectionHandlerPatch.PlayersNeededToStart = enterRoomParams.RoomOptions.MaxPlayers;
+            if (enterRoomParams != null)
+            {
+                if (enterRoomParams.RoomOptions != null)
+                {
+                    NetworkConnectionHandlerPatch.PlayersNeededToStart = enterRoomParams.RoomOptions.MaxPlayers;
+                    Debug.Log("OpJoinRoom max players set to: " + enterRoomParams.RoomOptions.MaxPlayers);
+                }
+            }
         }
     }
+    */
 }
 
  

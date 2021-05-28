@@ -8,17 +8,17 @@ namespace FFAMod
         [HarmonyPatch("DoShowPoints")]
         private static void Postfix()
         {
-            if (GM_ArmsRacePatch.WinningTeamID == 2)
+            if (GM_ArmsRacePatch.winningTeamID == 2)
             {
                 instance.text.color = PlayerSkinBank.GetPlayerSkinColors(2).winText;
             }
-            else if (GM_ArmsRacePatch.WinningTeamID == 3)
+            else if (GM_ArmsRacePatch.winningTeamID == 3)
             {
                 instance.text.color = PlayerSkinBank.GetPlayerSkinColors(3).winText;
             }
-            if (GM_ArmsRacePatch.WinningTeamID == 2)
+            if (GM_ArmsRacePatch.winningTeamID == 2)
             {
-                if (GM_ArmsRacePatch.P3Points == 1)
+                if (GM_ArmsRacePatch.p3Points == 1)
                 {
                     HalfRed();
                     return;
@@ -26,9 +26,9 @@ namespace FFAMod
                 RoundRed();
                 return;
             }
-            else if (GM_ArmsRacePatch.WinningTeamID == 3)
+            else if (GM_ArmsRacePatch.winningTeamID == 3)
             {
-                if (GM_ArmsRacePatch.P4Points == 1)
+                if (GM_ArmsRacePatch.p4Points == 1)
                 {
                     HalfGreen();
                     return;

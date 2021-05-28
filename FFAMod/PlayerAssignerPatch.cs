@@ -28,7 +28,7 @@ namespace FFAMod
         [HarmonyPatch("LateUpdate")]
         private static bool Prefix()
         {
-            if (GameManager.instance.battleOngoing)
+            if (GameManager.instance.battleOngoing && GM_Test.instance == null)
                 return false;
             return true;
         }
