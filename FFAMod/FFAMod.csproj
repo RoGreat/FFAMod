@@ -39,7 +39,7 @@
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-			<Private>False</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>$(GameFolder)\BepInEx\core\BepInEx.dll</HintPath>
@@ -85,14 +85,14 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-		<Reference Include="UnityEngine.UIModule">
+    <Reference Include="UnityEngine.UIModule">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharacterSelectionInstancePatch.cs" />
-    <Compile Include="ApplyCardStatsPatch.cs" />
+    <Compile Include="CardPatches.cs" />
     <Compile Include="FFAPlugin.cs" />
     <Compile Include="PlayerAssignerPatch.cs" />
     <Compile Include="NetworkConnectionHandlerPatch.cs" />

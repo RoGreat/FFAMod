@@ -4,7 +4,7 @@ using Sonigon;
 namespace FFAMod
 {
     [HarmonyPatch(typeof(ApplyCardStats))]
-    class ApplyCardStatsPatch
+    class ApplyCardStatsPatches
     {
         [HarmonyPatch("OFFLINE_Pick")]
         private static bool Prefix(Player[] players, ref Player ___playerToUpgrade, ApplyCardStats __instance)
