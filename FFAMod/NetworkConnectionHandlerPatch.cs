@@ -16,7 +16,7 @@ namespace FFAMod
     [HarmonyPatch(typeof(NetworkConnectionHandler))]
     internal class NetworkConnectionHandlerPatch : NetworkConnectionHandler
     {
-        public static int PlayersNeededToStart = 4;
+        public static int PlayersNeededToStart { get; private set; } = 4;
 
         /*
         [HarmonyTranspiler]
@@ -114,7 +114,7 @@ namespace FFAMod
         [HarmonyPatch("Update")]
         private static void Postfix()
         {
-            if (PhotonNetwork.IsMasterClient)
+            if (MainMenuHandler.instance.isOpen)
             {
                 if (Input.GetKey(KeyCode.Alpha4))
                 {

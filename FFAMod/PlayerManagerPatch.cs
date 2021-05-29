@@ -9,9 +9,10 @@ namespace FFAMod
     internal class PlayerManagerPatch : PlayerManager
     {
         [HarmonyPatch("GetOtherTeam")]
-        private static void Postfix(ref int __result, int team)
+        private static bool Prefix(ref int __result, int team)
         {
             __result = team;
+            return false;
         }
 
         public static int GetOtherTeamPatch(int team, int offset = 1)
