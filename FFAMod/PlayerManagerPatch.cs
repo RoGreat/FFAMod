@@ -33,6 +33,7 @@ namespace FFAMod
             __result = GetClosestPlayerInTeamPatch(position, team, needVision);
             return false;
         }
+
         private static Player GetClosestPlayerInTeamPatch(Vector3 position, int team, bool needVision)
         {
             Player result = null;

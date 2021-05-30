@@ -1,20 +1,14 @@
 ﻿using HarmonyLib;
 using Photon.Realtime;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 using SoundImplementation;
 using Photon.Pun;
 using UnityEngine;
 using Landfall.Network;
-using System;
-using System.Collections;
 
 namespace FFAMod
 {
     [HarmonyPatch(typeof(NetworkConnectionHandler))]
-    internal class NetworkConnectionHandlerPatch : NetworkConnectionHandler
+    internal class NetworkConnectionHandlerPatch
     {
         public static int PlayersNeededToStart { get; private set; } = 4;
 
@@ -39,7 +33,7 @@ namespace FFAMod
             {
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    instance.GetComponent<PhotonView>().RPC("RPCA_FoundGame", RpcTarget.All, new object[] { });
+                    NetworkConnectionHandler.instance.GetComponent<PhotonView>().RPC("RPCA_FoundGame", RpcTarget.All, new object[] { });
                 }
                 if (___m_SteamLobby != null)
                 {
@@ -47,7 +41,7 @@ namespace FFAMod
                 }
             }
             UnityEngine.Debug.Log("PlayerJoined");
-            instance.OnPlayerEnteredRoom(newPlayer);
+            NetworkConnectionHandler.instance.OnPlayerEnteredRoom(newPlayer);
             return false;
         }
 

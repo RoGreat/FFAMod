@@ -8,14 +8,14 @@ using UnityEngine;
 namespace FFAMod 
 {
     [HarmonyPatch(typeof(PlayerAssigner))]
-    internal class PlayerAssignerPatch : PlayerAssigner
+    internal class PlayerAssignerPatch
     {
         [HarmonyPatch("RPCM_RequestTeamAndPlayerID")]
         private static bool Prefix(int askingPlayer, ref bool ___waitingForRegisterResponse)
         {
             int count = PlayerManager.instance.players.Count;
             int num = count;
-            instance.GetComponent<PhotonView>().RPC("RPC_ReturnPlayerAndTeamID", PhotonNetwork.CurrentRoom.GetPlayer(askingPlayer), new object[]
+            PlayerAssigner.instance.GetComponent<PhotonView>().RPC("RPC_ReturnPlayerAndTeamID", PhotonNetwork.CurrentRoom.GetPlayer(askingPlayer), new object[]
             {
                 count,
                 num
@@ -39,22 +39,23 @@ namespace FFAMod
             __result = CreatePlayerPatch(inputDevice, isAI);
             return false;
         }
+
         private static IEnumerator CreatePlayerPatch(InputDevice inputDevice, bool isAI = false)
         {
-            PlayerAssigner playerAssigner = instance;
+            var instance = PlayerAssigner.instance;
             var waitingForRegisterResponse = AccessTools.Field(typeof(PlayerAssigner), "waitingForRegisterResponse");
             var hasCreatedLocalPlayer = AccessTools.Field(typeof(PlayerAssigner), "hasCreatedLocalPlayer");
             var playerIDToSet = AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet");
             var teamIDToSet = AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet");
-            if ((bool)waitingForRegisterResponse.GetValue(instance))
+            if ((bool)waitingForRegisterResponse.GetValue(PlayerAssigner.instance))
                 yield break;
-            if (!PhotonNetwork.OfflineMode && (bool)hasCreatedLocalPlayer.GetValue(playerAssigner))
+            if (!PhotonNetwork.OfflineMode && (bool)hasCreatedLocalPlayer.GetValue(instance))
                 yield break;
-            if (playerAssigner.players.Count < playerAssigner.maxPlayers)
+            if (instance.players.Count < instance.maxPlayers)
             {
                 if (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)
                 {
-                    playerAssigner.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, new object[] { PhotonNetwork.LocalPlayer.ActorNumber });
+                    instance.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, new object[] { PhotonNetwork.LocalPlayer.ActorNumber });
                     waitingForRegisterResponse.SetValue(instance, true);
                 }
                 while ((bool)waitingForRegisterResponse.GetValue(instance))
@@ -63,26 +64,24 @@ namespace FFAMod
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        playerIDToSet.SetValue(playerAssigner, PlayerManager.instance.players.Count);
-                        teamIDToSet.SetValue(playerAssigner, (int)playerIDToSet.GetValue(playerAssigner));
+                        playerIDToSet.SetValue(instance, PlayerManager.instance.players.Count);
+                        teamIDToSet.SetValue(instance, (int)playerIDToSet.GetValue(instance));
                     }
                 }
                 else
                 {
-                    playerIDToSet.SetValue(playerAssigner, PlayerManager.instance.players.Count);
-                    teamIDToSet.SetValue(playerAssigner, (int)playerIDToSet.GetValue(playerAssigner));
+                    playerIDToSet.SetValue(instance, PlayerManager.instance.players.Count);
+                    teamIDToSet.SetValue(instance, (int)playerIDToSet.GetValue(instance));
                 }
-                hasCreatedLocalPlayer.SetValue(playerAssigner, true);
+                hasCreatedLocalPlayer.SetValue(instance, true);
                 SoundPlayerStatic.Instance.PlayPlayerAdded();
                 Vector3 position = Vector3.up * 100f;
-                CharacterData component = PhotonNetwork.Instantiate(playerAssigner.playerPrefab.name, position, Quaternion.identity).GetComponent<CharacterData>();
+                CharacterData component = PhotonNetwork.Instantiate(instance.playerPrefab.name, position, Quaternion.identity).GetComponent<CharacterData>();
                 if (isAI)
                 {
-                    GameObject original = playerAssigner.player1AI;
-                    if (playerAssigner.players.Count > 0)
-                        original = playerAssigner.player2AI;
+                    GameObject original = instance.player2AI;
                     component.GetComponent<CharacterData>().SetAI();
-                    Instantiate(original, component.transform.position, component.transform.rotation, component.transform);
+                    Object.Instantiate(original, component.transform.position, component.transform.rotation, component.transform);
                 }
                 else
                 {
@@ -98,9 +97,9 @@ namespace FFAMod
                     }
                     component.playerActions.Device = inputDevice;
                 }
-                playerAssigner.players.Add(component);
+                instance.players.Add(component);
                 // playerAssigner.RegisterPlayer(component, playerAssigner.teamIDToSet, playerAssigner.playerIDToSet);
-                AccessTools.Method(typeof(PlayerAssigner), "RegisterPlayer").Invoke(playerAssigner, new object[] { component, teamIDToSet.GetValue(playerAssigner), playerIDToSet.GetValue(playerAssigner) });
+                AccessTools.Method(typeof(PlayerAssigner), "RegisterPlayer").Invoke(instance, new object[] { component, teamIDToSet.GetValue(instance), playerIDToSet.GetValue(instance) });
                 yield break;
             }
             yield break;

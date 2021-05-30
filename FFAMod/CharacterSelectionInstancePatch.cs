@@ -6,16 +6,18 @@ namespace FFAMod
     internal class CharacterSelectionInstancePatch
     {
         [HarmonyPatch("Update")]
-        private static void Prefix(CharacterSelectionInstance __instance)
+        private static bool Prefix(CharacterSelectionInstance __instance)
         {
             if (__instance.currentPlayer == null)
             {
-                return;
+                return false;
             }
             if (__instance.currentPlayer.GetComponent<PlayerAPI>().enabled)
             {
                 AccessTools.Method(typeof(CharacterSelectionInstance), "ReadyUp").Invoke(__instance, null);
+                return false;
             }
+            return true;
         }
     }
 }

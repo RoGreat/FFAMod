@@ -94,6 +94,7 @@
     <Compile Include="CharacterSelectionInstancePatch.cs" />
     <Compile Include="CardPatches.cs" />
     <Compile Include="FFAPlugin.cs" />
+    <Compile Include="GameCrownHandlerPatch.cs" />
     <Compile Include="PlayerAssignerPatch.cs" />
     <Compile Include="NetworkConnectionHandlerPatch.cs" />
     <Compile Include="PointVisualizerPatch.cs" />
