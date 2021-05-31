@@ -10,16 +10,20 @@ namespace FFAMod
 		private static int previousCrownHolder = 0;
 
 		[HarmonyPatch("LateUpdate")]
-		private static void Postfix(float ___crownPos, GameCrownHandler __instance, int ___currentCrownHolder)
+		private static void Postfix(GameCrownHandler __instance, int ___currentCrownHolder)
 		{
-			var GetCrownPos = AccessTools.Method(typeof(CharacterData), "GetCrownPos");
+			if (___currentCrownHolder == -1)
+			{
+				return;
+			}
+			var getCrownPos = AccessTools.Method(typeof(CharacterData), "GetCrownPos");
 			// Vector3 position = Vector3.LerpUnclamped(PlayerManager.instance.players[0].data.GetCrownPos(), PlayerManager.instance.players[1].data.GetCrownPos(), this.crownPos);
-			Vector3 position = Vector3.LerpUnclamped((Vector3)GetCrownPos.Invoke(PlayerManager.instance.players[previousCrownHolder].data, null), (Vector3)GetCrownPos.Invoke(PlayerManager.instance.players[___currentCrownHolder].data, null), 1f);
+			Vector3 position = Vector3.LerpUnclamped((Vector3)getCrownPos.Invoke(PlayerManager.instance.players[previousCrownHolder].data, null), (Vector3)getCrownPos.Invoke(PlayerManager.instance.players[___currentCrownHolder].data, null), 1f);
 			__instance.transform.position = position;
 		}
 
 		[HarmonyPatch("PointOver")]
-        private static bool Prefix(GM_ArmsRace ___gm, ref int ___currentCrownHolder, ref float ___crownPos, GameCrownHandler __instance)
+        private static bool Prefix(GM_ArmsRace ___gm, ref int ___currentCrownHolder, GameCrownHandler __instance)
         {
 			previousCrownHolder = 0;
 			int p1Rounds = ___gm.p1Rounds;
@@ -81,7 +85,6 @@ namespace FFAMod
 				if (___currentCrownHolder == -1)
 				{
 					___currentCrownHolder = num;
-					___crownPos = ___currentCrownHolder;
 					__instance.GetComponent<CurveAnimation>().PlayIn();
 					return false;
 				}

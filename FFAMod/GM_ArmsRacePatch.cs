@@ -125,7 +125,7 @@ namespace FFAMod
             TimeHandler.instance.DoSlowDown();
             if (!PhotonNetwork.IsMasterClient)
                 return false;
-            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
+            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
             return false;
         }
 
@@ -137,12 +137,12 @@ namespace FFAMod
             int losingTeamID3 = -1;
             if (PlayerManager.instance.players.Count >= 3)
             {
-                losingTeamID2 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 2);
+                losingTeamID2 = PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 2);
                 UnityEngine.Debug.Log("Losing team: " + losingTeamID2);
             }
             if (PlayerManager.instance.players.Count == 4)
             {
-                losingTeamID3 = PlayerManagerPatch.GetOtherTeamPatch(PlayerManager.instance.GetLastTeamAlive(), 3);
+                losingTeamID3 = PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 3);
                 UnityEngine.Debug.Log("Losing team: " + losingTeamID3);
             }
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
@@ -243,9 +243,7 @@ namespace FFAMod
                         yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
                         CardChoiceVisuals.instance.Show(i, true);
                         if (player.GetComponent<PlayerAPI>().enabled == true)
-                        {
                             yield return AIPick(player);
-                        }
                         else if (player.teamID != winningTeamID)
                             yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
                         yield return new WaitForSecondsRealtime(0.3f);
@@ -255,7 +253,6 @@ namespace FFAMod
                 setPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
             }
             yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
-            CardChoiceVisuals.instance.Hide();
             TimeHandler.instance.DoSlowDown();
             MapManager.instance.CallInNewMapAndMovePlayers(MapManager.instance.currentLevelID);
             PlayerManager.instance.RevivePlayers();
@@ -292,7 +289,6 @@ namespace FFAMod
             AccessTools.Field(typeof(CardChoice), "pickerType").SetValue(CardChoice.instance, PickerType.Team);
             // -- StartPick
             CardChoice.instance.pickrID = player.playerID;
-            CardChoice.instance.IsPicking = true;
             CardChoice.instance.picks = 1;
             ArtHandler.instance.SetSpecificArt(CardChoice.instance.cardPickArt);
             // -- Pick
@@ -302,9 +298,6 @@ namespace FFAMod
             // -- Update
             // -- DoPlayerSelect
             SoundMusicManager.Instance.PlayIngame(true);
-            var setCurrentSelected = AccessTools.Method(typeof(CardChoiceVisuals), "SetCurrentSelected");
-            // CardChoiceVisuals.instance.SetCurrentSelected(this.currentlySelectedCard);
-            setCurrentSelected.Invoke(CardChoiceVisuals.instance, new object[] { 0 });
             // - CardBar
             // -- OnHover
             var spawnedCards = (List<GameObject>)AccessTools.Field(typeof(CardChoice), "spawnedCards").GetValue(CardChoice.instance);
@@ -314,10 +307,11 @@ namespace FFAMod
             currentCard.GetComponentInChildren<GraphicRaycaster>().enabled = false;
             currentCard.GetComponentInChildren<SetScaleToZero>().enabled = false;
             currentCard.GetComponentInChildren<SetScaleToZero>().transform.localScale = Vector3.one * 1.15f;
-            // -- ApplyCardStats
+            // - ApplyCardStats
             currentCard.transform.root.GetComponentInChildren<ApplyCardStats>().Pick(CardChoice.instance.pickrID, true);
             yield return new WaitForSecondsRealtime(1f);
-
+            // - CardChoice
+            // -- IDoEndPick
             CardChoice.instance.StartCoroutine(CardChoice.instance.IDoEndPick(currentCard, 0, CardChoice.instance.pickrID));
             CardChoice.instance.pickrID = -1;
             UIHandler.instance.StopShowPicker();

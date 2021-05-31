@@ -6,8 +6,10 @@ using UnityEngine;
 namespace FFAMod
 {
     [HarmonyPatch(typeof(PlayerManager))]
-    internal class PlayerManagerPatch : PlayerManager
+    internal class PlayerManagerPatch
     {
+        // Original GetOtherTeam method returns own team instead of other team
+        // Utilized in the GetClosestPlayerInTeam patched method only
         [HarmonyPatch("GetOtherTeam")]
         private static bool Prefix(ref int __result, int team)
         {
@@ -15,8 +17,9 @@ namespace FFAMod
             return false;
         }
 
-        public static int GetOtherTeamPatch(int team, int offset = 1)
+        public static int GetOtherTeam(int team, int offset = 1)
         {
+            var instance = PlayerManager.instance;
             int[] array;
             if (instance.players.Count == 4)
                 array = new int[4] { 0, 1, 2, 3 };
@@ -30,12 +33,13 @@ namespace FFAMod
         [HarmonyPatch("GetClosestPlayerInTeam")]
         private static bool Prefix(ref Player __result, Vector3 position, int team, bool needVision)
         {
-            __result = GetClosestPlayerInTeamPatch(position, team, needVision);
+            __result = GetClosestPlayerInTeam(position, team, needVision);
             return false;
         }
 
-        private static Player GetClosestPlayerInTeamPatch(Vector3 position, int team, bool needVision)
+        private static Player GetClosestPlayerInTeam(Vector3 position, int team, bool needVision)
         {
+            var instance = PlayerManager.instance;
             Player result = null;
             Player[] players = instance.players.ToArray();
             float num = float.MaxValue;
@@ -60,6 +64,7 @@ namespace FFAMod
 
         public static int TeamsAlivePatch()
         {
+            var instance = PlayerManager.instance;
             bool flag = false;
             bool flag2 = false;
             bool flag3 = false;
