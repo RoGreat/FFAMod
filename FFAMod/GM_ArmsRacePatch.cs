@@ -223,6 +223,7 @@ namespace FFAMod
             var instance = GM_ArmsRace.instance;
             var setPlayersVisible = AccessTools.Method(typeof(PlayerManager), "SetPlayersVisible");
             var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
+            GM_ArmsRacePatch.winningTeamID = winningTeamID;
             instance.StartCoroutine(PointVisualizer.instance.DoWinSequence(instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds, winningTeamID == 0));
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
