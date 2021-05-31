@@ -31,7 +31,7 @@ namespace FFAMod
         }
 
         [HarmonyPatch("GetClosestPlayerInTeam")]
-        private static bool Prefix(ref Player __result, Vector3 position, int team, bool needVision)
+        private static bool Prefix(ref Player __result, Vector3 position, int team, bool needVision = false)
         {
             __result = GetClosestPlayerInTeam(position, team, needVision);
             return false;

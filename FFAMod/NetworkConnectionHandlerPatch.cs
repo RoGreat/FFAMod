@@ -4,6 +4,10 @@ using SoundImplementation;
 using Photon.Pun;
 using UnityEngine;
 using Landfall.Network;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using System.Reflection;
+using System.Linq;
 
 namespace FFAMod
 {
@@ -25,10 +29,31 @@ namespace FFAMod
         }
 
         [HarmonyPatch("OnPlayerEnteredRoom")]
-        private static bool Prefix(Photon.Realtime.Player newPlayer, ClientSteamLobby ___m_SteamLobby)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            SoundPlayerStatic.Instance.PlayPlayerAdded();
+            var codes = instructions.ToList();
+            int stage = 0;
+            for (int i = 0; i < codes.Count; i++)
+            {
+                if (stage == 0 && codes[i].opcode == OpCodes.Call && codes[i].operand is MethodInfo && (codes[i].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(PhotonNetwork), "PlayerList"))
+                {
+                    stage++;
+                }
+                if (stage == 1 && codes[i].opcode == OpCodes.Ldc_I4_2)
+                {
+                    codes[i].opcode = OpCodes.Ldc_I4_4;
+                    break;
+                }
+            }
+            return codes.AsEnumerable();
+        }
+
+        [HarmonyPatch("OnPlayerEnteredRoom")]
+        private static bool Prefix(ClientSteamLobby ___m_SteamLobby)
+        {
             PlayersNeededToStart = PhotonNetwork.CurrentRoom.MaxPlayers;
+            if (PlayersNeededToStart == 4)
+                return true;
             if (PhotonNetwork.PlayerList.Length == PlayersNeededToStart)
             {
                 if (PhotonNetwork.IsMasterClient)
@@ -40,9 +65,7 @@ namespace FFAMod
                     ___m_SteamLobby.HideLobby();
                 }
             }
-            UnityEngine.Debug.Log("PlayerJoined");
-            NetworkConnectionHandler.instance.OnPlayerEnteredRoom(newPlayer);
-            return false;
+            return true;
         }
 
         [HarmonyPatch("Update")]

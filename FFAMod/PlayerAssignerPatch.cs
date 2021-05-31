@@ -36,11 +36,11 @@ namespace FFAMod
         [HarmonyPatch("CreatePlayer")]
         private static bool Prefix(ref IEnumerator __result, InputDevice inputDevice, bool isAI = false)
         {
-            __result = CreatePlayerPatch(inputDevice, isAI);
+            __result = CreatePlayer(inputDevice, isAI);
             return false;
         }
 
-        private static IEnumerator CreatePlayerPatch(InputDevice inputDevice, bool isAI = false)
+        private static IEnumerator CreatePlayer(InputDevice inputDevice, bool isAI)
         {
             var instance = PlayerAssigner.instance;
             var waitingForRegisterResponse = AccessTools.Field(typeof(PlayerAssigner), "waitingForRegisterResponse");
@@ -55,7 +55,7 @@ namespace FFAMod
             {
                 if (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)
                 {
-                    instance.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, new object[] { PhotonNetwork.LocalPlayer.ActorNumber });
+                    PlayerAssigner.instance.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, new object[] { PhotonNetwork.LocalPlayer.ActorNumber });
                     waitingForRegisterResponse.SetValue(instance, true);
                 }
                 while ((bool)waitingForRegisterResponse.GetValue(instance))
