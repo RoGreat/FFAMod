@@ -62,7 +62,7 @@ namespace FFAMod
             return result;
         }
 
-        public static int TeamsAlivePatch()
+        public static int TeamsAlive()
         {
             var instance = PlayerManager.instance;
             bool flag = false;
@@ -91,6 +91,501 @@ namespace FFAMod
                 num++;
             return num;
         }
+
+        [HarmonyPatch("MovePlayers")]
+        private static void Prefix()
+        {
+            if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[0])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[1])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[2])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[3])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[4])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[5])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[6])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[7])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[8])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[9])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[10])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[11])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[12])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[13])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[14])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[15])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[16])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[17])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[18])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[19])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[20])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[21])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[22])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[23])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[24])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[25])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[26])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[27])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[28])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[29])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[30])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[31])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[32])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[33])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[34])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[35])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[36])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[37])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[38])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[39])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[40])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[41])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[42])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[43])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[44])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[45])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[46])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[47])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[48])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[49])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[50])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[51])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[52])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[53])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[54])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[55])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[56])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[57])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[58])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[59])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[60])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[61])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[62])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[63])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[64])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[65])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[66])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[67])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[68])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+            else if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[69])
+            {
+                GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 2").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 3").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+                GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
+            }
+=======
                 [HarmonyPatch("MovePlayers")]
         private static bool Prefix()
         {

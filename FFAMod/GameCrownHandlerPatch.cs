@@ -10,7 +10,7 @@ namespace FFAMod
 		private static int previousCrownHolder = 0;
 
 		[HarmonyPatch("LateUpdate")]
-		private static void Postfix(GameCrownHandler __instance, int ___currentCrownHolder)
+		private static void Postfix(GameCrownHandler __instance, int ___currentCrownHolder, float ___crownPos)
 		{
 			if (___currentCrownHolder == -1)
 			{

@@ -26,7 +26,17 @@ namespace FFAMod
             p4Points = 0;
             p3Rounds = 0;
             p4Rounds = 0;
-            PlayerAssigner.instance.maxPlayers = NetworkConnectionHandlerPatch.PlayersNeededToStart;
+            if (PhotonNetwork.CurrentRoom != null && !PhotonNetwork.OfflineMode)
+            {
+                UnityEngine.Debug.Log("ONLINE MODE");
+                PlayerAssigner.instance.maxPlayers = PhotonNetwork.CurrentRoom.MaxPlayers;
+                UnityEngine.Debug.Log("GM_ArmsRace maxPlayers " + PlayerAssigner.instance.maxPlayers);
+            }
+            else
+            {
+                UnityEngine.Debug.Log("OFFLINE MODE");
+                PlayerAssigner.instance.maxPlayers = NetworkConnectionHandlerPatch.PlayersNeededToStart;
+            }
         }
 
         [HarmonyPatch("PlayerJoined")]
@@ -36,31 +46,38 @@ namespace FFAMod
             {
                 return false;
             }
+            else if (PhotonNetwork.CurrentRoom != null)
+            {
+                UnityEngine.Debug.Log("ONLINE MODE");
+                PlayerAssigner.instance.maxPlayers = PhotonNetwork.CurrentRoom.MaxPlayers;
+            }
             int count = PlayerManager.instance.players.Count;
+            UnityEngine.Debug.Log("PlayerJoined count " + count);
+            UnityEngine.Debug.Log("PlayerJoined maxPlayers " + PlayerAssigner.instance.maxPlayers);
             if (!PhotonNetwork.OfflineMode)
             {
                 if (player.data.view.IsMine)
                 {
-                    if (NetworkConnectionHandlerPatch.PlayersNeededToStart - count == 3)
+                    if (PlayerAssigner.instance.maxPlayers - count == 3)
                     {
-                        UIHandler.instance.ShowJoinGameText("ADD THREE MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                        UIHandler.instance.ShowJoinGameText("ADD THREE MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(1).winText);
                     }
-                    if (NetworkConnectionHandlerPatch.PlayersNeededToStart - count == 2)
+                    if (PlayerAssigner.instance.maxPlayers - count == 2)
                     {
-                        UIHandler.instance.ShowJoinGameText("ADD TWO MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                        UIHandler.instance.ShowJoinGameText("ADD TWO MORE PLAYERS TO START", PlayerSkinBank.GetPlayerSkinColors(1).winText);
                     }
-                    if (NetworkConnectionHandlerPatch.PlayersNeededToStart - count == 1)
+                    if (PlayerAssigner.instance.maxPlayers - count == 1)
                     {
-                        UIHandler.instance.ShowJoinGameText("ADD ONE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                        UIHandler.instance.ShowJoinGameText("ADD ONE MORE PLAYER TO START", PlayerSkinBank.GetPlayerSkinColors(1).winText);
                     }
                 }
                 else
                 {
-                    UIHandler.instance.ShowJoinGameText("PRESS JUMP\n TO JOIN", PlayerSkinBank.GetPlayerSkinColors(count).winText);
+                    UIHandler.instance.ShowJoinGameText("PRESS JUMP\n TO JOIN", PlayerSkinBank.GetPlayerSkinColors(1).winText);
                 }
             }
             player.data.isPlaying = false;
-            if (count >= NetworkConnectionHandlerPatch.PlayersNeededToStart)
+            if (count >= PlayerAssigner.instance.maxPlayers)
             {
                 GM_ArmsRace.instance.StartGame();
             }
@@ -120,7 +137,7 @@ namespace FFAMod
             var instance = GM_ArmsRace.instance;
             if (!PhotonNetwork.OfflineMode)
                 UnityEngine.Debug.Log("PlayerDied: " + killedPlayer.data.view.Owner.NickName);
-            if (PlayerManagerPatch.TeamsAlivePatch() >= 2)
+            if (PlayerManagerPatch.TeamsAlive() >= 2)
                 return false;
             TimeHandler.instance.DoSlowDown();
             if (!PhotonNetwork.IsMasterClient)
