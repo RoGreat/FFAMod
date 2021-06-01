@@ -42,24 +42,31 @@ namespace FFAMod
 
         private static IEnumerator CreatePlayer(InputDevice inputDevice, bool isAI)
         {
+            UnityEngine.Debug.Log("Creating Player");
             var instance = PlayerAssigner.instance;
             var waitingForRegisterResponse = AccessTools.Field(typeof(PlayerAssigner), "waitingForRegisterResponse");
             var hasCreatedLocalPlayer = AccessTools.Field(typeof(PlayerAssigner), "hasCreatedLocalPlayer");
             var playerIDToSet = AccessTools.Field(typeof(PlayerAssigner), "playerIDToSet");
             var teamIDToSet = AccessTools.Field(typeof(PlayerAssigner), "teamIDToSet");
-            if ((bool)waitingForRegisterResponse.GetValue(PlayerAssigner.instance))
+            if ((bool)waitingForRegisterResponse.GetValue(instance))
+            {
+                UnityEngine.Debug.Log("Waiting for register response and not creating player");
                 yield break;
+            }
             if (!PhotonNetwork.OfflineMode && (bool)hasCreatedLocalPlayer.GetValue(instance))
                 yield break;
+            UnityEngine.Debug.Log("CreatePlayer maxPlayers " + instance.maxPlayers);
             if (instance.players.Count < instance.maxPlayers)
             {
                 if (!PhotonNetwork.OfflineMode && !PhotonNetwork.IsMasterClient)
                 {
                     PlayerAssigner.instance.GetComponent<PhotonView>().RPC("RPCM_RequestTeamAndPlayerID", RpcTarget.MasterClient, new object[] { PhotonNetwork.LocalPlayer.ActorNumber });
                     waitingForRegisterResponse.SetValue(instance, true);
+                    UnityEngine.Debug.Log("Waiting for register response");
                 }
                 while ((bool)waitingForRegisterResponse.GetValue(instance))
                     yield return null;
+                UnityEngine.Debug.Log("No longer waiting for register response");
                 if (!PhotonNetwork.OfflineMode)
                 {
                     if (PhotonNetwork.IsMasterClient)
@@ -100,6 +107,7 @@ namespace FFAMod
                 instance.players.Add(component);
                 // playerAssigner.RegisterPlayer(component, playerAssigner.teamIDToSet, playerAssigner.playerIDToSet);
                 AccessTools.Method(typeof(PlayerAssigner), "RegisterPlayer").Invoke(instance, new object[] { component, teamIDToSet.GetValue(instance), playerIDToSet.GetValue(instance) });
+                UnityEngine.Debug.Log("Player Registered");
                 yield break;
             }
             yield break;

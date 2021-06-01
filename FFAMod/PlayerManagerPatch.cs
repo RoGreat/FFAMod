@@ -62,7 +62,7 @@ namespace FFAMod
             return result;
         }
 
-        public static int TeamsAlivePatch()
+        public static int TeamsAlive()
         {
             var instance = PlayerManager.instance;
             bool flag = false;

@@ -1,54 +1,26 @@
 ﻿using HarmonyLib;
-using Sonigon;
+using UnityEngine;
 
 namespace FFAMod
 {
-    [HarmonyPatch(typeof(ApplyCardStats))]
-    class ApplyCardStatsPatches
+    [HarmonyPatch(typeof(CardBarHandler))]
+    class CardBarHandlerPatch
     {
-        [HarmonyPatch("OFFLINE_Pick")]
-        private static bool Prefix(Player[] players, ref Player ___playerToUpgrade, ApplyCardStats __instance)
+        [HarmonyPatch("Start")]
+        private static void Prefix(CardBarHandler __instance, ref CardBar[] ___cardBars)
         {
-            // Have to skip AddCard for now
-            if (players[0].teamID > 1)
-            {
-                ___playerToUpgrade = players[0];
-                AccessTools.Method(typeof(ApplyCardStats), "ApplyStats").Invoke(__instance, null);
-                CardBarPatch.play = true;
-                return false;
-            }
-            return true;
+            CardBarHandler.instance = __instance;
+            ___cardBars = __instance.GetComponentsInChildren<CardBar>();
+            var bar3 = Object.Instantiate(___cardBars[0], CardBarHandler.instance.transform);
+            bar3.name = "Bar3";
+            bar3.transform.position = ___cardBars[0].transform.position + Vector3.down * 4f;
+            bar3.GetComponentInParent<CardBar>();
+            var bar4 = Object.Instantiate(___cardBars[1], CardBarHandler.instance.transform);
+            bar4.name = "Bar4";
+            bar4.transform.position = ___cardBars[1].transform.position + Vector3.down * 4f;
+            bar4.GetComponentInParent<CardBar>();
+            ___cardBars.AddToArray(bar3);
+            ___cardBars.AddToArray(bar4);
         }
-
-        [HarmonyPatch("RPCA_Pick")]
-        private static bool Prefix(int[] actorIDs, ref Player ___playerToUpgrade, ApplyCardStats __instance)
-        {
-            // Have to skip AddCard for now
-            Player playerActorID = (Player)AccessTools.Method(typeof(PlayerManager), "GetPlayerWithActorID").Invoke(PlayerManager.instance, new object[] { actorIDs[0] });
-            if (playerActorID.teamID > 1)
-            {
-                ___playerToUpgrade = playerActorID;
-                AccessTools.Method(typeof(ApplyCardStats), "ApplyStats").Invoke(__instance, null);
-                CardBarPatch.play = true;
-                return false;
-            }
-            return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(CardBar))]
-    class CardBarPatch
-    {
-        [HarmonyPatch("Update")]
-        private static void Postfix(CardBar __instance)
-        {
-            if (play)
-            {
-                SoundManager.Instance.Play(__instance.soundCardPick, __instance.transform);
-                play = false;
-            }
-        }
-
-        public static bool play;
     }
 }

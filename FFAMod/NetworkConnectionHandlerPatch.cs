@@ -49,11 +49,12 @@ namespace FFAMod
         }
 
         [HarmonyPatch("OnPlayerEnteredRoom")]
-        private static bool Prefix(ClientSteamLobby ___m_SteamLobby)
+        private static void Prefix(ClientSteamLobby ___m_SteamLobby)
         {
             PlayersNeededToStart = PhotonNetwork.CurrentRoom.MaxPlayers;
+            UnityEngine.Debug.Log("CurrentRoom MaxPlayers " + PlayersNeededToStart);
             if (PlayersNeededToStart == 4)
-                return true;
+                return;
             if (PhotonNetwork.PlayerList.Length == PlayersNeededToStart)
             {
                 if (PhotonNetwork.IsMasterClient)
@@ -65,7 +66,6 @@ namespace FFAMod
                     ___m_SteamLobby.HideLobby();
                 }
             }
-            return true;
         }
 
         [HarmonyPatch("Update")]

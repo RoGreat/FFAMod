@@ -97,6 +97,7 @@
     <Compile Include="GameCrownHandlerPatch.cs" />
     <Compile Include="PlayerAssignerPatch.cs" />
     <Compile Include="NetworkConnectionHandlerPatch.cs" />
+    <Compile Include="CharacterSelectionMenuPatch.cs" />
     <Compile Include="PointVisualizerPatch.cs" />
     <Compile Include="PlayerManagerPatch.cs" />
     <Compile Include="GM_ArmsRacePatch.cs" />
