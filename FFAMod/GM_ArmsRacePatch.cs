@@ -276,7 +276,7 @@ namespace FFAMod
             // this.isTransitioning = false;
             AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(instance, false);
             GameManager.instance.battleOngoing = true;
-            // UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
             RoundCounter();
         }
 
@@ -293,7 +293,7 @@ namespace FFAMod
             string winText = instance.p1Points.ToString() + " - " + instance.p2Points.ToString();
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
             instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
-            //UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
             RoundCounter();
         }
 
@@ -303,7 +303,7 @@ namespace FFAMod
             {
                 var instance = UIHandler.instance;
                 instance.jointGameText.transform.position = instance.roundCounterSmall.transform.position + Vector3.down * 6f;
-                instance.jointGameText.text = p3Rounds + "\n" + p4Rounds;
+                instance.jointGameText.text = string.Format("R: {0}\nG: {1}", p3Rounds, p4Rounds);
                 instance.joinGamePart.loop = true;
                 instance.joinGamePart.Play();
             }
