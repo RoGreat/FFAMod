@@ -10,7 +10,7 @@ namespace FFAMod
 		private static int previousCrownHolder = 0;
 
 		[HarmonyPatch("LateUpdate")]
-		private static void Postfix(GameCrownHandler __instance, int ___currentCrownHolder, float ___crownPos)
+		private static void Postfix(GameCrownHandler __instance, int ___currentCrownHolder)
 		{
 			if (___currentCrownHolder == -1)
 			{
@@ -93,43 +93,6 @@ namespace FFAMod
 				AccessTools.Method(typeof(GameCrownHandler), "GiveCrownToPlayer").Invoke(__instance, new object[] { num });
 			}
 			return false;
-		}
-
-		[HarmonyPatch("IGiveCrownToPlayer")]
-		private static bool Prefix(int playerID, ref IEnumerator __result, GameCrownHandler __instance)
-		{
-			__result = IGiveCrownToPlayer(playerID, __instance);
-			return false;
-		}
-
-		private static IEnumerator IGiveCrownToPlayer(int playerID, GameCrownHandler __instance)
-		{
-			var crownPos = AccessTools.Field(typeof(GameCrownHandler), "crownPos");
-			int fromInt = previousCrownHolder;
-			int toInt;
-			if (playerID == 0)
-			{
-				toInt = 0;
-			}
-			else if (playerID == 1)
-			{
-				toInt = 1;
-			}
-			else if (playerID == 2)
-			{
-				toInt = 2;
-			}
-			else
-			{
-				toInt = 3;
-			}
-			for (float i = 0f; i < __instance.transitionCurve.keys[__instance.transitionCurve.keys.Length - 1].time; i += Time.unscaledDeltaTime)
-			{
-				// this.crownPos = Mathf.LerpUnclamped((float)fromInt, (float)toInt, this.transitionCurve.Evaluate(i));
-				crownPos.SetValue(__instance, Mathf.LerpUnclamped(fromInt, toInt, __instance.transitionCurve.Evaluate(i)));
-				yield return null;
-			}
-			yield break;
 		}
 	}
 }

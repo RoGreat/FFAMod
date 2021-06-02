@@ -30,12 +30,7 @@ namespace FFAMod
             {
                 UnityEngine.Debug.Log("ONLINE MODE");
                 PlayerAssigner.instance.maxPlayers = PhotonNetwork.CurrentRoom.MaxPlayers;
-                UnityEngine.Debug.Log("GM_ArmsRace maxPlayers " + PlayerAssigner.instance.maxPlayers);
-            }
-            else
-            {
-                UnityEngine.Debug.Log("OFFLINE MODE");
-                PlayerAssigner.instance.maxPlayers = NetworkConnectionHandlerPatch.PlayersNeededToStart;
+                UnityEngine.Debug.Log("Start maxPlayers " + PlayerAssigner.instance.maxPlayers);
             }
         }
 
@@ -44,6 +39,8 @@ namespace FFAMod
         {
             if (PhotonNetwork.OfflineMode)
             {
+                UnityEngine.Debug.Log("OFFLINE MODE");
+                PlayerAssigner.instance.maxPlayers = NetworkConnectionHandlerPatch.PlayersNeededToStart;
                 return false;
             }
             else if (PhotonNetwork.CurrentRoom != null)
@@ -152,6 +149,7 @@ namespace FFAMod
             var instance = GM_ArmsRace.instance;
             int losingTeamID2 = -1;
             int losingTeamID3 = -1;
+            UnityEngine.Debug.Log("Losing team: " + losingTeamID);
             if (PlayerManager.instance.players.Count >= 3)
             {
                 losingTeamID2 = PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 2);
@@ -164,7 +162,6 @@ namespace FFAMod
             }
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
             pointsToWinRound = ___pointsToWinRound;
-            UnityEngine.Debug.Log("Losing team: " + losingTeamID);
             UnityEngine.Debug.Log("Winning team: " + winningTeamID);
             if (___isTransitioning)
                 return false;
@@ -279,7 +276,8 @@ namespace FFAMod
             // this.isTransitioning = false;
             AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(instance, false);
             GameManager.instance.battleOngoing = true;
-            UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            // UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            RoundCounter();
         }
 
         private static void PointOver(int winningTeamID)
@@ -295,7 +293,20 @@ namespace FFAMod
             string winText = instance.p1Points.ToString() + " - " + instance.p2Points.ToString();
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
             instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
-            UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            //UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            RoundCounter();
+        }
+
+        private static void RoundCounter()
+        {
+            if (PlayerManager.instance.players.Count >= 3)
+            {
+                var instance = UIHandler.instance;
+                instance.jointGameText.transform.position = instance.roundCounterSmall.transform.position + Vector3.down * 6f;
+                instance.jointGameText.text = p3Rounds + "\n" + p4Rounds;
+                instance.joinGamePart.loop = true;
+                instance.joinGamePart.Play();
+            }
         }
 
         private static IEnumerator AIPick(Player player)

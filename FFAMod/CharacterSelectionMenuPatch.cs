@@ -6,9 +6,8 @@ namespace FFAMod
     [HarmonyPatch(typeof(CharacterSelectionMenu))]
     internal class CharacterSelectionMenuPatch
     {
-        [HarmonyPrefix]
         [HarmonyPatch("PlayerJoined")]
-        private static bool Prefix2()
+        private static bool Prefix()
         {
             if (PhotonNetwork.OfflineMode)
                 return true;

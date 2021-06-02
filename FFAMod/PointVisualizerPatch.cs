@@ -18,9 +18,11 @@ namespace FFAMod
                 instance.text.color = PlayerSkinBank.GetPlayerSkinColors(2).winText;
                 if (GM_ArmsRacePatch.p3Points == 1)
                 {
+                    instance.orangeFill.fillAmount = 0.5f;
                     HalfRed();
                     return;
                 }
+                instance.orangeFill.fillAmount = 1f;
                 RoundRed();
                 return;
             }
@@ -29,9 +31,11 @@ namespace FFAMod
                 instance.text.color = PlayerSkinBank.GetPlayerSkinColors(3).winText;
                 if (GM_ArmsRacePatch.p4Points == 1)
                 {
+                    instance.blueFill.fillAmount = 0.5f;
                     HalfGreen();
                     return;
                 }
+                instance.blueFill.fillAmount = 1f;
                 RoundGreen();
                 return;
             }
@@ -57,44 +61,17 @@ namespace FFAMod
             PointVisualizer.instance.text.text = "ROUND GREEN";
         }
 
-        //public static Transform redBall;
-        //public static Transform greenBall;
-        //private static RectTransform redBallRT;
-        //private static RectTransform greenBallRT;
-        //public static Image redFill;
-        //public static Image greenFill;
-        //private static Vector3 redVel;
-        //private static Vector3 greenVel;
-        //private static Vector3 redSP;
-        //private static Vector3 greenSP;
-
-        //private static int orangePoints;
-        //private static int bluePoints;
-        //private static int orangeRounds;
-        //private static int blueRounds;
-
-        //[HarmonyPatch("Start")]
-        //private static void Prefix()
-        //{
-        //    redBallRT = redBall.GetComponent<RectTransform>();
-        //    greenBallRT = greenBall.GetComponent<RectTransform>();
-        //    redSP = redBall.GetComponent<RectTransform>().anchoredPosition + Vector2.down * 0.5f;
-        //    greenSP = greenBall.GetComponent<RectTransform>().anchoredPosition + Vector2.down * 0.5f;
-        //}
-
         //[HarmonyPatch("DoWinSequence")]
         //private static bool Prefix(ref IEnumerator __result, int orangePoints, int bluePoints, int orangeRounds, int blueRounds)
         //{
-        //    PointVisualizerPatch.orangePoints = orangePoints;
-        //    PointVisualizerPatch.bluePoints = bluePoints;
-        //    PointVisualizerPatch.orangeRounds = orangeRounds;
-        //    PointVisualizerPatch.blueRounds = blueRounds;
-        //    __result = DoWinSequence();
+        //    __result = DoWinSequence(orangePoints, bluePoints, orangeRounds, blueRounds);
         //    return false;
         //}
 
-        //private static IEnumerator DoWinSequence()
+        //private static IEnumerator DoWinSequence(int orangePoints, int bluePoints, int orangeRounds, int blueRounds)
         //{
+        //    int redRounds = GM_ArmsRacePatch.p3Rounds;
+        //    int greenRounds = GM_ArmsRacePatch.p4Rounds;
         //    bool orangeWinner = GM_ArmsRacePatch.winningTeamID == 0;
         //    bool blueWinner = GM_ArmsRacePatch.winningTeamID == 1;
         //    bool redWinner = GM_ArmsRacePatch.winningTeamID == 2;
@@ -130,13 +107,13 @@ namespace FFAMod
         //        {
         //            blueBallRT.sizeDelta = Vector2.LerpUnclamped(blueBallRT.sizeDelta, Vector2.one * ballSmallSize, instance.scaleCurve.Evaluate(c / instance.timeToScale));
         //        }
-        //        else if (blueWinner)
+        //        else if (redWinner)
         //        {
-        //            redBallRT.sizeDelta = Vector2.LerpUnclamped(redBallRT.sizeDelta, Vector2.one * ballSmallSize, instance.scaleCurve.Evaluate(c / instance.timeToScale));
+        //            orangeBallRT.sizeDelta = Vector2.LerpUnclamped(orangeBallRT.sizeDelta, Vector2.one * ballSmallSize, instance.scaleCurve.Evaluate(c / instance.timeToScale));
         //        }
         //        else
         //        {
-        //            greenBallRT.sizeDelta = Vector2.LerpUnclamped(greenBallRT.sizeDelta, Vector2.one * ballSmallSize, instance.scaleCurve.Evaluate(c / instance.timeToScale));
+        //            blueBallRT.sizeDelta = Vector2.LerpUnclamped(blueBallRT.sizeDelta, Vector2.one * ballSmallSize, instance.scaleCurve.Evaluate(c / instance.timeToScale));
         //        }
         //        c += Time.unscaledDeltaTime;
         //        yield return null;
@@ -157,11 +134,11 @@ namespace FFAMod
         //        }
         //        else if (redWinner)
         //        {
-        //            redBall.position = Vector3.LerpUnclamped(redBall.position, (Vector3)getPointPos.Invoke(UIHandler.instance.roundCounterSmall, new object[] { 2 }), instance.scaleCurve.Evaluate(c / instance.timeToMove));
+        //            instance.orangeBall.position = Vector3.LerpUnclamped(instance.orangeBall.position, (Vector3)getPointPos.Invoke(UIHandlerPatch.roundCounterSmall2, new object[] { 0 }), instance.scaleCurve.Evaluate(c / instance.timeToMove));
         //        }
         //        else
         //        {
-        //            greenBall.position = Vector3.LerpUnclamped(greenBall.position, (Vector3)getPointPos.Invoke(UIHandler.instance.roundCounterSmall, new object[] { 3 }), instance.scaleCurve.Evaluate(c / instance.timeToMove));
+        //            instance.blueBall.position = Vector3.LerpUnclamped(instance.blueBall.position, (Vector3)getPointPos.Invoke(UIHandlerPatch.roundCounterSmall2, new object[] { 1 }), instance.scaleCurve.Evaluate(c / instance.timeToMove));
         //        }
         //        c += Time.unscaledDeltaTime;
         //        yield return null;
@@ -177,17 +154,25 @@ namespace FFAMod
         //    }
         //    else if (redWinner)
         //    {
-        //        redBall.position = (Vector3)getPointPos.Invoke(UIHandler.instance.roundCounterSmall, new object[] { 2 });
+        //        instance.orangeBall.position = (Vector3)getPointPos.Invoke(UIHandlerPatch.roundCounterSmall2, new object[] { 0 });
         //    }
         //    else
         //    {
-        //        greenBall.position = (Vector3)getPointPos.Invoke(UIHandler.instance.roundCounterSmall, new object[] { 3 });
+        //        instance.blueBall.position = (Vector3)getPointPos.Invoke(UIHandlerPatch.roundCounterSmall2, new object[] { 1 });
         //    }
         //    yield return new WaitForSecondsRealtime(instance.timeBetween);
         //    c = 0f;
         //    while (c < instance.timeToMove)
         //    {
         //        if (!orangeWinner)
+        //        {
+        //            instance.orangeBall.position = Vector3.LerpUnclamped(instance.orangeBall.position, CardChoiceVisuals.instance.transform.position, instance.scaleCurve.Evaluate(c / instance.timeToMove));
+        //        }
+        //        else if (!blueWinner)
+        //        {
+        //            instance.blueBall.position = Vector3.LerpUnclamped(instance.blueBall.position, CardChoiceVisuals.instance.transform.position, instance.scaleCurve.Evaluate(c / instance.timeToMove));
+        //        }
+        //        else if (!redWinner)
         //        {
         //            instance.orangeBall.position = Vector3.LerpUnclamped(instance.orangeBall.position, CardChoiceVisuals.instance.transform.position, instance.scaleCurve.Evaluate(c / instance.timeToMove));
         //        }
@@ -199,6 +184,14 @@ namespace FFAMod
         //        yield return null;
         //    }
         //    if (!orangeWinner)
+        //    {
+        //        instance.orangeBall.position = CardChoiceVisuals.instance.transform.position;
+        //    }
+        //    else if (!blueWinner)
+        //    {
+        //        instance.blueBall.position = CardChoiceVisuals.instance.transform.position;
+        //    }
+        //    else if (!redWinner)
         //    {
         //        instance.orangeBall.position = CardChoiceVisuals.instance.transform.position;
         //    }
@@ -220,11 +213,11 @@ namespace FFAMod
         //        }
         //        else if (!redWinner)
         //        {
-        //            redBallRT.sizeDelta = Vector2.LerpUnclamped(redBallRT.sizeDelta, Vector2.one * bigBallScale, instance.scaleCurve.Evaluate(c / instance.timeToScale));
+        //            orangeBallRT.sizeDelta = Vector2.LerpUnclamped(orangeBallRT.sizeDelta, Vector2.one * bigBallScale, instance.scaleCurve.Evaluate(c / instance.timeToScale));
         //        }
         //        else
         //        {
-        //            greenBallRT.sizeDelta = Vector2.LerpUnclamped(greenBallRT.sizeDelta, Vector2.one * bigBallScale, instance.scaleCurve.Evaluate(c / instance.timeToScale));
+        //            blueBallRT.sizeDelta = Vector2.LerpUnclamped(blueBallRT.sizeDelta, Vector2.one * bigBallScale, instance.scaleCurve.Evaluate(c / instance.timeToScale));
         //        }
         //        c += Time.unscaledDeltaTime;
         //        yield return null;
@@ -234,40 +227,12 @@ namespace FFAMod
         //    // CardChoiceVisuals.instance.Show((!orangeWinner) ? 0 : 1, false);
         //    CardChoiceVisuals.instance.Show(GM_ArmsRacePatch.winningTeamID, false);
         //    UIHandler.instance.roundCounterSmall.UpdateRounds(orangeRounds, blueRounds);
-        //    UIHandler.instance.roundCounterSmall.UpdateRounds(orangeRounds, blueRounds);
+        //    UIHandlerPatch.roundCounterSmall2.UpdateRounds(redRounds, greenRounds);
         //    UIHandler.instance.roundCounterSmall.UpdatePoints(0, 0);
+        //    UIHandlerPatch.roundCounterSmall2.UpdatePoints(0, 0);
         //    instance.DoShowPoints(0, 0, orangeWinner);
         //    close.Invoke(instance, null);
         //    yield break;
-        //}
-
-        //[HarmonyPostfix]
-        //[HarmonyPatch("ResetPoints")]
-        //private static void Postfix1()
-        //{
-        //    redFill.fillAmount = 0f;
-        //    greenFill.fillAmount = 0f;
-        //}
-
-        //[HarmonyPostfix]
-        //[HarmonyPatch("ResetBalls")]
-        //private static void Postfix2()
-        //{
-        //    float ballBaseSize = (float)AccessTools.Field(typeof(PointVisualizer), "ballBaseSize").GetValue(PointVisualizer.instance);
-        //    redBallRT.sizeDelta = Vector2.one * ballBaseSize;
-        //    greenBallRT.sizeDelta = Vector2.one * ballBaseSize;
-        //    redBall.GetComponent<RectTransform>().anchoredPosition = redSP;
-        //    greenBall.GetComponent<RectTransform>().anchoredPosition = greenSP;
-        //    redVel = Vector3.zero;
-        //    greenVel = Vector3.zero;
-        //}
-
-        //[HarmonyPostfix]
-        //[HarmonyPatch("Close")]
-        //private static void Postfix3()
-        //{
-        //    greenBall.gameObject.SetActive(false);
-        //    redBall.gameObject.SetActive(false);
         //}
     }
 }

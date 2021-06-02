@@ -92,6 +92,7 @@ namespace FFAMod
             return num;
         }
 
+        /*
         [HarmonyPatch("MovePlayers")]
         private static void Prefix()
         {
@@ -586,5 +587,6 @@ namespace FFAMod
                 GameObject.Find("SPAWN POINT 4").GetComponent<SpawnPoint>().localStartPos = new Vector3(0f, 0f);
             }
         }
+        */
     }
 }
