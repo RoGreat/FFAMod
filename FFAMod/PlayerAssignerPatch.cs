@@ -86,7 +86,7 @@ namespace FFAMod
                 CharacterData component = PhotonNetwork.Instantiate(instance.playerPrefab.name, position, Quaternion.identity).GetComponent<CharacterData>();
                 if (isAI)
                 {
-                    GameObject original = instance.player1AI;
+                    GameObject original = instance.player2AI;
                     component.GetComponent<CharacterData>().SetAI();
                     Object.Instantiate(original, component.transform.position, component.transform.rotation, component.transform);
                 }

@@ -110,7 +110,7 @@ namespace FFAMod
                     Player player = PlayerManager.instance.players[i];
                     yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
                     CardChoiceVisuals.instance.Show(i, true);
-                    if (player.GetComponent<PlayerAPI>().enabled == true)
+                    if (player.GetComponent<PlayerAPI>().enabled)
                         yield return AIPick(player);
                     else
                         yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Team);
@@ -298,7 +298,7 @@ namespace FFAMod
                             }
                         }
                         CardChoiceVisuals.instance.Show(i, true);
-                        if (player.GetComponent<PlayerAPI>().enabled == true)
+                        if (player.GetComponent<PlayerAPI>().enabled)
                             yield return AIPick(player);
                         else if (player.teamID != winningTeamID && flag)
                             yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
@@ -319,6 +319,7 @@ namespace FFAMod
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
             instance.StartCoroutine(RoundCountdown());
+            TextRoundCounter();
         }
 
         private static void PointOver(int winningTeamID)
@@ -359,6 +360,9 @@ namespace FFAMod
                 health[i] = players[i].data.health;
                 players[i].data.maxHealth = float.MaxValue;
                 players[i].data.health = float.MaxValue;
+                var particle = players[i].data.block.particle.main;
+                particle.loop = true;
+                players[i].data.block.particle.Play();
             }
             UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "3", 1f);
             yield return new WaitForSecondsRealtime(1f);
@@ -372,6 +376,8 @@ namespace FFAMod
             {
                 players[i].data.maxHealth = maxHealth[i];
                 players[i].data.health = health[i];
+                var particle = players[i].data.block.particle.main;
+                particle.loop = false;
             }
             yield return new WaitForSeconds(0.25f);
             yield break;
@@ -382,11 +388,12 @@ namespace FFAMod
             if (PlayerManager.instance.players.Count >= 3)
             {
                 var instance = UIHandler.instance;
-                instance.jointGameText.transform.position = instance.roundCounterSmall.transform.position + Vector3.down * 6f;
-                if (PlayerManager.instance.players.Count == 4)
-                    instance.jointGameText.text = string.Format("R: {0}\nG: {1}", p3Rounds, p4Rounds);
-                else
+                instance.jointGameText.transform.position = instance.roundCounterSmall.transform.position + Vector3.down * 4f + Vector3.left * 1f;
+                instance.jointGameText.fontSize = 72f;
+                if (PlayerManager.instance.players.Count == 3)
                     instance.jointGameText.text = string.Format("R: {0}", p3Rounds);
+                else
+                    instance.jointGameText.text = string.Format("R: {0}\nG: {1}", p3Rounds, p4Rounds);
                 instance.joinGamePart.loop = true;
                 instance.joinGamePart.Play();
             }
