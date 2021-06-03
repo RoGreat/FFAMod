@@ -22,10 +22,6 @@ namespace FFAMod
         [HarmonyPatch("Start")]
         private static void Postfix()
         {
-            p3Points = 0;
-            p4Points = 0;
-            p3Rounds = 0;
-            p4Rounds = 0;
             if (PhotonNetwork.CurrentRoom != null && !PhotonNetwork.OfflineMode)
             {
                 UnityEngine.Debug.Log("ONLINE MODE");
@@ -84,10 +80,15 @@ namespace FFAMod
         [HarmonyPatch("DoStartGame")]
         private static bool Prefix(ref IEnumerator __result)
         {
-            __result = DoStartGamePatch();
+            // ResetMatch
+            p3Points = 0;
+            p4Points = 0;
+            p3Rounds = 0;
+            p4Rounds = 0;
+            __result = DoStartGame();
             return false;
         }
-        private static IEnumerator DoStartGamePatch()
+        private static IEnumerator DoStartGame()
         {
             var instance = GM_ArmsRace.instance;
             var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
@@ -123,8 +124,10 @@ namespace FFAMod
             TimeHandler.instance.StartGame();
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            TextRoundCounter();
             // PlayerManager.instance.SetPlayersVisible(true);
             setPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
+            instance.StartCoroutine(RoundCountdown());
             yield break;
         }
 
@@ -239,6 +242,7 @@ namespace FFAMod
             var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
             instance.StartCoroutine(PointVisualizer.instance.DoWinSequence(instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds, winningTeamID == 0));
+            TextRoundCounter();
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
             yield return new WaitForSecondsRealtime(0.3f);
@@ -249,17 +253,54 @@ namespace FFAMod
                 UnityEngine.Debug.Log("PICK PHASE");
                 // PlayerManager.instance.SetPlayersVisible(false);
                 setPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
-                for (int i = 0; i < PlayerManager.instance.players.Count; i++)
+                var players = PlayerManager.instance.players;
+                for (int i = 0; i < players.Count; i++)
                 {
-                    Player player = PlayerManager.instance.players[i];
+                    Player player = players[i];
                     if (player.teamID != winningTeamID)
                     {
                         // yield return this.StartCoroutine(gmArmsRace.WaitForSyncUp());
                         yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
+                        bool flag = true;
+                        // New system to try and balance the game out a bit
+                        // If you are winning already, why another card!?
+                        // The ultimate goal is to be a catchup mechanic!
+                        if (players.Count >= 3)
+                        {
+                            int p1Rounds = instance.p1Rounds;
+                            int p2Rounds = instance.p2Rounds;
+                            Dictionary<int, int> idToRounds = new Dictionary<int, int>
+                            {
+                                { 0, p1Rounds },
+                                { 1, p2Rounds },
+                                { 2, p3Rounds },
+                                { 3, p4Rounds }
+                            };
+                            idToRounds.TryGetValue(winningTeamID, out int winnerRounds);
+                            switch (player.teamID)
+                            {
+                                case 0:
+                                    if (p1Rounds > winnerRounds)
+                                        flag = false;
+                                    break;
+                                case 1:
+                                    if (p2Rounds > winnerRounds)
+                                        flag = false;
+                                    break;
+                                case 2:
+                                    if (p3Rounds > winnerRounds)
+                                        flag = false;
+                                    break;
+                                default:
+                                    if (p4Rounds > winnerRounds)
+                                        flag = false;
+                                    break;
+                            }
+                        }
                         CardChoiceVisuals.instance.Show(i, true);
                         if (player.GetComponent<PlayerAPI>().enabled == true)
                             yield return AIPick(player);
-                        else if (player.teamID != winningTeamID)
+                        else if (player.teamID != winningTeamID && flag)
                             yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
                         yield return new WaitForSecondsRealtime(0.3f);
                     }
@@ -277,7 +318,7 @@ namespace FFAMod
             AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(instance, false);
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
-            RoundCounter();
+            instance.StartCoroutine(RoundCountdown());
         }
 
         private static void PointOver(int winningTeamID)
@@ -294,16 +335,58 @@ namespace FFAMod
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
             instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
-            RoundCounter();
+            instance.StartCoroutine(PointCountdown());
         }
 
-        private static void RoundCounter()
+        private static IEnumerator PointCountdown()
+        {
+            yield return new WaitForSecondsRealtime(2f);
+            GM_ArmsRace.instance.StartCoroutine(RoundCountdown());
+            yield break;
+        }
+
+        private static IEnumerator RoundCountdown()
+        {
+            var players = PlayerManager.instance.players;
+            float[] maxHealth = new float[4];
+            float[] health = new float[4];
+            var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
+            if (players.Count < 3)
+                yield break;
+            for (int i = 0; i < players.Count; i++)
+            {
+                maxHealth[i] = players[i].data.maxHealth;
+                health[i] = players[i].data.health;
+                players[i].data.maxHealth = float.MaxValue;
+                players[i].data.health = float.MaxValue;
+            }
+            UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "3", 1f);
+            yield return new WaitForSecondsRealtime(1f);
+            UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "2", 1f);
+            yield return new WaitForSecondsRealtime(1f);
+            UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "1", 1f);
+            yield return new WaitForSecondsRealtime(1f);
+            yield return GM_ArmsRace.instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(GM_ArmsRace.instance, null));
+            UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "GOO!", 1f);
+            for (int i = 0; i < players.Count; i++)
+            {
+                players[i].data.maxHealth = maxHealth[i];
+                players[i].data.health = health[i];
+            }
+            yield return new WaitForSeconds(0.25f);
+            yield break;
+        }
+
+        private static void TextRoundCounter()
         {
             if (PlayerManager.instance.players.Count >= 3)
             {
                 var instance = UIHandler.instance;
                 instance.jointGameText.transform.position = instance.roundCounterSmall.transform.position + Vector3.down * 6f;
-                instance.jointGameText.text = string.Format("R: {0}\nG: {1}", p3Rounds, p4Rounds);
+                if (PlayerManager.instance.players.Count == 4)
+                    instance.jointGameText.text = string.Format("R: {0}\nG: {1}", p3Rounds, p4Rounds);
+                else
+                    instance.jointGameText.text = string.Format("R: {0}", p3Rounds);
                 instance.joinGamePart.loop = true;
                 instance.joinGamePart.Play();
             }
