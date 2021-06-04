@@ -53,6 +53,9 @@
       <HintPath>$(GameFolder)\Rounds_Data\Managed\netstandard.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>$(GameFolder)\Rounds_Data\Managed\Photon3Unity3D.dll</HintPath>
+    </Reference>
     <Reference Include="PhotonRealtime">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\PhotonRealtime.dll</HintPath>
       <Private>False</Private>
@@ -97,6 +100,7 @@
   <ItemGroup>
     <Compile Include="CharacterSelectionInstancePatch.cs" />
     <Compile Include="CardBarHandlerPatch.cs" />
+    <Compile Include="DisplayMatchPlayerNamesPatch.cs" />
     <Compile Include="FFAPlugin.cs" />
     <Compile Include="GameCrownHandlerPatch.cs" />
     <Compile Include="PlayerAssignerPatch.cs" />
