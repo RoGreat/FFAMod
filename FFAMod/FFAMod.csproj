@@ -55,6 +55,7 @@
     </Reference>
     <Reference Include="Photon3Unity3D">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\Photon3Unity3D.dll</HintPath>
+			<Private>False</Private>
     </Reference>
     <Reference Include="PhotonRealtime">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\PhotonRealtime.dll</HintPath>
