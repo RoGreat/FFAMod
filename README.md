@@ -2,6 +2,7 @@
 ROUNDS mod that makes the game a free-for-all for offline and online play. Can play with up to 4 people.
 
 Everyone must use this mod with the BepInEx modloader dependency adapted to ROUNDS by Willis in order for it to work.
+Put the FFAMod.dll into the ...\ROUNDS\BepInEx\plugins folder.
 
 If you are hosting the server, set the maximum player limit in the main menu before you create the room by hitting 2, 3, or 4 on the top row of your keyboard. By default it is set to 4. It must be equal to the amount of players that will join the lobby.
 
