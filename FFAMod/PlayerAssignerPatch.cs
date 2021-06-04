@@ -26,20 +26,23 @@ namespace FFAMod
 
         // AI bugs out when battle is going
         [HarmonyPatch("LateUpdate")]
-        private static bool Prefix()
+        private static bool Prefix(PlayerAssigner __instance)
         {
-            bool flag = true;
-			for (int i = 0; i < this.players.Count; i++)
-			{
-				if (this.players[i].playerActions.Device == null)
-				{
-					flag = false;
-				}
-			}
-			if (flag)
-			{
-				base.StartCoroutine(this.CreatePlayer(null, false));
-			}
+            if (!PhotonNetwork.OfflineMode)
+            {
+                bool flag = true;
+                for (int i = 0; i < __instance.players.Count; i++)
+                {
+                    if (__instance.players[i].playerActions.Device == null)
+                    {
+                        flag = false;
+                    }
+                }
+                if (flag)
+                {
+                    __instance.StartCoroutine(__instance.CreatePlayer(null, false));
+                }
+            }
             if (GameManager.instance.battleOngoing && GM_Test.instance == null)
                 return false;
             return true;
@@ -54,7 +57,7 @@ namespace FFAMod
 
         private static IEnumerator CreatePlayer(InputDevice inputDevice, bool isAI)
         {
-            yield return WaitForSecondsRealtime(PhotonNetwork.LocalPlayer.ActorNumber);
+            yield return new WaitForSecondsRealtime(PhotonNetwork.LocalPlayer.ActorNumber);
             UnityEngine.Debug.Log("Creating Player");
             var instance = PlayerAssigner.instance;
             var waitingForRegisterResponse = AccessTools.Field(typeof(PlayerAssigner), "waitingForRegisterResponse");
