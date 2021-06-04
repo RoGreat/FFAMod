@@ -18,33 +18,80 @@ namespace FFAMod
         public static int winningTeamID;
         private static int pointsToWinRound;
         private static GameObject currentCard;
+        private static int waitingForOtherPlayers;
 
-        //[HarmonyPostfix]
-        //[HarmonyPatch("PointTransition")]
-        //private static void Postfix1()
-        //{
-        //    GM_ArmsRace.instance.StartCoroutine(Countdown());
-        //}
+        [HarmonyPatch("IDoRematch")]
+        private static bool Prefix(ref IEnumerator __result, GM_ArmsRace __instance)
+        {
+            __result = IDoRematch(__instance);
+            return false;
+        }
 
-        //private static IEnumerator Countdown()
-        //{
-        //    var players = PlayerManager.instance.players;
-        //    if (players.Count < 3)
-        //        yield break;
-        //    for (int i = 0; i < players.Count; i++)
-        //    {
-        //        players[i].data.silenceHandler.RPCA_AddSilence(10f);
-        //    }
-        //    UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "3", 1f);
-        //    yield return new WaitForSecondsRealtime(1f);
-        //    UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "2", 1f);
-        //    yield return new WaitForSecondsRealtime(1f);
-        //    UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "1", 1f);
-        //    yield return new WaitForSecondsRealtime(1f);
-        //    UIHandler.instance.DisplayScreenText(PlayerManager.instance.GetColorFromTeam(1).winText, "GOO!", 1f);
-        //    yield return new WaitForSeconds(0.25f);
-        //    yield break;
-        //}
+        private static IEnumerator IDoRematch(GM_ArmsRace __instance)
+        {
+            if (!PhotonNetwork.OfflineMode)
+            {
+                __instance.GetComponent<PhotonView>().RPC("RPCA_PlayAgain", RpcTarget.All, new object[] { });
+                UIHandler.instance.DisplayScreenTextLoop("WAITING");
+                float c = 0f;
+                while (waitingForOtherPlayers < PlayerAssigner.instance.maxPlayers)
+                {
+                    c += Time.unscaledDeltaTime;
+                    if (c > 10f)
+                    {
+                        DoRestart();
+                        yield break;
+                    }
+                    yield return null;
+                }
+            }
+            yield return null;
+            UIHandler.instance.StopScreenTextLoop();
+            ResetMatch(__instance);
+            UIHandler.instance.ShowRoundCounterSmall(__instance.p1Rounds, __instance.p2Rounds, __instance.p1Points, __instance.p2Points);
+            CardBarHandler.instance.ResetCardBards();
+            PointVisualizer.instance.ResetPoints();
+            var doStartGame = AccessTools.Method(typeof(GM_ArmsRace), "DoStartGame").Invoke(__instance, null);
+            __instance.StartCoroutine((IEnumerator)doStartGame);
+            waitingForOtherPlayers = 0;
+            yield break;
+        }
+
+        [HarmonyPatch("RPCA_PlayAgain")]
+        private static bool Prefix()
+        {
+            waitingForOtherPlayers += 1;
+            return false;
+        }
+
+        private static void ResetMatch(GM_ArmsRace __instance)
+        {
+            __instance.p1Points = 0;
+            __instance.p1Rounds = 0;
+            __instance.p2Points = 0;
+            __instance.p2Rounds = 0;
+            p3Points = 0;
+            p4Points = 0;
+            p3Rounds = 0;
+            p4Rounds = 0;
+            //this.isTransitioning = false;
+            AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(__instance, false);
+            waitingForOtherPlayers = 0;
+            UIHandler.instance.ShowRoundCounterSmall(__instance.p1Rounds, __instance.p2Rounds, __instance.p1Points, __instance.p2Points);
+            CardBarHandler.instance.ResetCardBards();
+            PointVisualizer.instance.ResetPoints();
+        }
+
+        private static void DoRestart()
+        {
+            GameManager.instance.battleOngoing = false;
+            if (PhotonNetwork.OfflineMode)
+            {
+                Application.LoadLevel(Application.loadedLevel);
+                return;
+            }
+            NetworkConnectionHandler.instance.NetworkRestart();
+        }
 
         [HarmonyPatch("Start")]
         private static void Postfix()
@@ -284,43 +331,7 @@ namespace FFAMod
                 for (int i = 0; i < players.Count; i++)
                 {
                     Player player = players[i];
-                    bool flag = true;
-                    // New system to try and balance the game out a bit
-                    // If you are winning already, why another card!?
-                    // The ultimate goal is to be a catchup mechanic!
-                    if (players.Count >= 3)
-                    {
-                        int p1Rounds = instance.p1Rounds;
-                        int p2Rounds = instance.p2Rounds;
-                        Dictionary<int, int> idToRounds = new Dictionary<int, int>
-                            {
-                                { 0, p1Rounds },
-                                { 1, p2Rounds },
-                                { 2, p3Rounds },
-                                { 3, p4Rounds }
-                            };
-                        idToRounds.TryGetValue(winningTeamID, out int winnerRounds);
-                        switch (player.teamID)
-                        {
-                            case 0:
-                                if (p1Rounds > winnerRounds)
-                                    flag = false;
-                                break;
-                            case 1:
-                                if (p2Rounds > winnerRounds)
-                                    flag = false;
-                                break;
-                            case 2:
-                                if (p3Rounds > winnerRounds)
-                                    flag = false;
-                                break;
-                            default:
-                                if (p4Rounds > winnerRounds)
-                                    flag = false;
-                                break;
-                        }
-                    }
-                    if (player.teamID != winningTeamID && flag)
+                    if (player.teamID != winningTeamID && player.data.currentCards.Count < GM_ArmsRace.instance.roundsToWinGame)
                     {
                         // yield return this.StartCoroutine(gmArmsRace.WaitForSyncUp());
                         yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
