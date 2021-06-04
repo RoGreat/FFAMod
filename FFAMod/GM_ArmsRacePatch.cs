@@ -47,10 +47,8 @@ namespace FFAMod
             }
             yield return null;
             UIHandler.instance.StopScreenTextLoop();
+            AccessTools.Method(typeof(PlayerManager), "ResetCharacters").Invoke(PlayerManager.instance, null);
             ResetMatch(__instance);
-            UIHandler.instance.ShowRoundCounterSmall(__instance.p1Rounds, __instance.p2Rounds, __instance.p1Points, __instance.p2Points);
-            CardBarHandler.instance.ResetCardBards();
-            PointVisualizer.instance.ResetPoints();
             var doStartGame = AccessTools.Method(typeof(GM_ArmsRace), "DoStartGame").Invoke(__instance, null);
             __instance.StartCoroutine((IEnumerator)doStartGame);
             waitingForOtherPlayers = 0;
@@ -87,7 +85,9 @@ namespace FFAMod
             GameManager.instance.battleOngoing = false;
             if (PhotonNetwork.OfflineMode)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 Application.LoadLevel(Application.loadedLevel);
+#pragma warning restore CS0618 // Type or member is obsolete
                 return;
             }
             NetworkConnectionHandler.instance.NetworkRestart();
@@ -162,6 +162,7 @@ namespace FFAMod
             __result = DoStartGame();
             return false;
         }
+
         private static IEnumerator DoStartGame()
         {
             var instance = GM_ArmsRace.instance;
