@@ -83,6 +83,7 @@
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(GameFolder)\Rounds_Data\Managed\UnityEngine.UI.dll</HintPath>
