@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace FFAMod
@@ -34,6 +34,14 @@ namespace FFAMod
 			int p2Points = ___gm.p2Points;
 			int p3Points = GM_ArmsRacePatch.p3Points;
 			int p4Points = GM_ArmsRacePatch.p4Points;
+			int[] rounds = new int[4]
+			{
+				p1Rounds,
+				p2Rounds,
+				p3Rounds,
+				p4Rounds
+			};
+			int roundsMax = rounds.Max();
 			int num = -1;
 			int num2 = -1;
 			if (p1Rounds > p2Rounds && p1Rounds > p3Rounds && p1Rounds > p4Rounds)
@@ -55,19 +63,19 @@ namespace FFAMod
 			if (num2 == -1)
 			{
 				int num3 = -1;
-				if (p1Points > p2Points && p1Points > p3Points && p1Points > p4Points)
+				if (rounds[0] == roundsMax && (p1Rounds == p2Rounds && p1Points > p2Points || p1Rounds == p3Rounds && p1Points > p3Points || p1Rounds == p4Rounds && p1Points > p4Points))
 				{
 					num3 = 0;
 				}
-				if (p2Points > p1Points && p2Points > p3Points && p2Points > p4Points)
+				if (rounds[1] == roundsMax && (p2Rounds == p1Rounds && p2Points > p1Points || p2Rounds == p3Rounds && p2Points > p3Points || p2Rounds == p4Rounds && p2Points > p4Points))
 				{
 					num3 = 1;
 				}
-				if (p3Points > p1Points && p3Points > p2Points && p3Points > p4Points)
+				if (rounds[2] == roundsMax && (p3Rounds == p1Rounds && p3Points > p1Points || p3Rounds == p2Rounds && p3Points > p2Points || p3Rounds == p4Rounds && p3Points > p4Points))
 				{
 					num3 = 2;
 				}
-				if (p4Points > p1Points && p4Points > p2Points && p4Points > p3Points)
+				if (rounds[3] == roundsMax && (p4Rounds == p1Rounds && p4Points > p1Points || p4Rounds == p2Rounds && p4Points > p2Points || p4Rounds == p3Rounds && p4Points > p3Points))
 				{
 					num3 = 3;
 				}

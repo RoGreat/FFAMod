@@ -95,6 +95,8 @@ namespace FFAMod
         [HarmonyPatch("MovePlayers")]
         private static void Prefix()
         {
+            if (PlayerManager.instance.players.Count < 3)
+                return;
             if (GameObject.Find("SPAWN POINT 1").scene.name == MapManager.instance.levels[0])
             {
                 GameObject.Find("SPAWN POINT 1").GetComponent<SpawnPoint>().localStartPos = new Vector3(-30f, -5f);

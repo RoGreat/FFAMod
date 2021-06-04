@@ -214,11 +214,20 @@ namespace FFAMod
             if (PlayerManagerPatch.TeamsAlive() >= 2)
                 return false;
             TimeHandler.instance.DoSlowDown();
+            instance.StartCoroutine(WaitForSyncUp());
             if (!PhotonNetwork.IsMasterClient)
                 return false;
             ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
             return false;
         }
+
+        private static IEnumerator WaitForSyncUp()
+        {
+            var instance = GM_ArmsRace.instance;
+            var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp").Invoke(instance, null);
+            yield return instance.StartCoroutine((IEnumerator)waitForSyncUp);
+        }
+
 
         [HarmonyPatch("RPCA_NextRound")]
         private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning, int ___pointsToWinRound)
@@ -332,15 +341,18 @@ namespace FFAMod
                 for (int i = 0; i < players.Count; i++)
                 {
                     Player player = players[i];
-                    if (player.teamID != winningTeamID && player.data.currentCards.Count < GM_ArmsRace.instance.roundsToWinGame)
+                    if (player.teamID != winningTeamID)
                     {
-                        // yield return this.StartCoroutine(gmArmsRace.WaitForSyncUp());
                         yield return instance.StartCoroutine((IEnumerator)waitForSyncUp.Invoke(instance, null));
                         CardChoiceVisuals.instance.Show(i, true);
-                        if (player.GetComponent<PlayerAPI>().enabled)
-                            yield return AIPick(player);
-                        else if (player.teamID != winningTeamID)
-                            yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
+                        if (player.data.currentCards.Count < GM_ArmsRace.instance.roundsToWinGame)
+                        {
+                            // yield return this.StartCoroutine(gmArmsRace.WaitForSyncUp());
+                            if (player.GetComponent<PlayerAPI>().enabled)
+                                yield return AIPick(player);
+                            else
+                                yield return CardChoice.instance.DoPick(1, player.playerID, PickerType.Player);
+                        }
                         yield return new WaitForSecondsRealtime(0.3f);
                     }
                 }
