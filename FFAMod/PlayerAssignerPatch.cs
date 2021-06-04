@@ -28,6 +28,8 @@ namespace FFAMod
         [HarmonyPatch("LateUpdate")]
         private static bool Prefix(PlayerAssigner __instance)
         {
+            if (GameManager.instance.battleOngoing && GM_Test.instance == null)
+                return false;
             if (!PhotonNetwork.OfflineMode)
             {
                 bool flag = true;
@@ -42,9 +44,8 @@ namespace FFAMod
                 {
                     __instance.StartCoroutine(__instance.CreatePlayer(null, false));
                 }
-            }
-            if (GameManager.instance.battleOngoing && GM_Test.instance == null)
                 return false;
+            }
             return true;
         }
 
