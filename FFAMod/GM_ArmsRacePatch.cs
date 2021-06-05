@@ -200,7 +200,7 @@ namespace FFAMod
             TimeHandler.instance.StartGame();
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
-            TextRoundCounter();
+            
             // PlayerManager.instance.SetPlayersVisible(true);
             setPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
             yield break;
@@ -317,7 +317,7 @@ namespace FFAMod
             instance.p2Points = 0;
             p3Points = 0;
             p4Points = 0;
-            TextRoundCounter();
+            
         }
 
         private static IEnumerator RoundTransition(int winningTeamID)
@@ -327,7 +327,7 @@ namespace FFAMod
             var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
             instance.StartCoroutine(PointVisualizer.instance.DoWinSequence(instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds, winningTeamID == 0));
-            TextRoundCounter();
+            
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
             yield return new WaitForSecondsRealtime(0.3f);
@@ -403,29 +403,7 @@ namespace FFAMod
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
             instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
-            TextRoundCounter();
-        }
-
-        private static void TextRoundCounter()
-        {
-            if (PlayerManager.instance.players.Count >= 3)
-            {
-                var instance = UIHandler.instance;
-                instance.jointGameText.transform.position = instance.roundCounterSmall.transform.position + Vector3.down * 4f;
-                instance.jointGameText.fontSize = 72f;
-                int p3HalfPoint = 0;
-                int p4HalfPoint = 0;
-                if (p3Points == 1)
-                    p3HalfPoint = 5;
-                if (p4Points == 1)
-                    p4HalfPoint = 5;
-                if (PlayerManager.instance.players.Count == 3)
-                    instance.jointGameText.text = string.Format("R: {0}.{1}", p3Rounds, p3HalfPoint);
-                else
-                    instance.jointGameText.text = string.Format("R: {0}.{1}\nG: {2}.{3}", p3Rounds, p3HalfPoint, p4Rounds, p4HalfPoint);
-                instance.joinGamePart.loop = true;
-                instance.joinGamePart.Play();
-            }
+            
         }
 
         private static IEnumerator AIPick(Player player)
