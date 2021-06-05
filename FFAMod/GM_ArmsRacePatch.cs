@@ -209,31 +209,23 @@ namespace FFAMod
         [HarmonyPatch("PlayerDied")]
         private static bool Prefix(Player killedPlayer, PhotonView ___view)
         {
-            var instance = GM_ArmsRace.instance;
             if (!PhotonNetwork.OfflineMode)
                 UnityEngine.Debug.Log("PlayerDied: " + killedPlayer.data.view.Owner.NickName);
             if (PlayerManagerPatch.TeamsAlive() >= 2)
                 return false;
             TimeHandler.instance.DoSlowDown();
-            instance.StartCoroutine(WaitForSyncUp());
             if (!PhotonNetwork.IsMasterClient)
                 return false;
-            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
+            ___view.RPC("RPCA_NextRound", RpcTarget.All, -1, -1, -1, -1, -1, -1);
             return false;
         }
 
-        private static IEnumerator WaitForSyncUp()
-        {
-            var instance = GM_ArmsRace.instance;
-            var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp").Invoke(instance, null);
-            yield return instance.StartCoroutine((IEnumerator)waitForSyncUp);
-        }
-
-
         [HarmonyPatch("RPCA_NextRound")]
-        private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning, int ___pointsToWinRound)
+        private static bool Prefix(ref bool ___isTransitioning, int ___pointsToWinRound)
         {
             var instance = GM_ArmsRace.instance;
+            int losingTeamID = PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive());
+            int winningTeamID = PlayerManager.instance.GetLastTeamAlive();
             int losingTeamID2 = -1;
             int losingTeamID3 = -1;
             UnityEngine.Debug.Log("Losing team: " + losingTeamID);
@@ -253,10 +245,6 @@ namespace FFAMod
             if (___isTransitioning)
                 return false;
             GameManager.instance.battleOngoing = false;
-            instance.p1Points = p1PointsSet;
-            instance.p2Points = p2PointsSet;
-            instance.p1Rounds = p1RoundsSet;
-            instance.p2Rounds = p2RoundsSet;
             ___isTransitioning = true;
             GameManager.instance.GameOver(winningTeamID, losingTeamID);
             if (losingTeamID2 >= 0)
