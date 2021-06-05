@@ -50,18 +50,24 @@ namespace FFAMod
                 {
                     PlayerManager.instance.players[i].data.currentCards.Clear();
                 }
+                            if (PlayerManager.instance.players.Count >= 3)
+            {
+
                 var children = GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>();
                 foreach (var child in children)
                 {
                     child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
                     child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
-                }
+                }}
+                            if (PlayerManager.instance.players.Count == 4)
+            {
+
                 var children2 = GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>();
                 foreach (var child in children2)
                 {
                     child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
                     child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
-                }
+                }}
             }
             yield return null;
             UIHandler.instance.StopScreenTextLoop();
