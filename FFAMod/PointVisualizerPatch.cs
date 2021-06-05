@@ -12,30 +12,30 @@ namespace FFAMod
         {
             if (GameObject.Find("P3") == null)
             {
-            GameObject childObject = GameObject.Instantiate(GameObject.Find("P1")) as GameObject;
-            childObject.transform.parent = GameObject.Find("RoundsSmall").transform;
-            childObject.name = "P3";
-            childObject.transform.localScale = new Vector3(1,1,1);
-            childObject.transform.position = new Vector3(-34.1654f, 16.2717f, -95f);
-            childObject.transform.localPosition = new Vector3(-79.3617f, -43.7602f, 0f);
-            GameObject.Destroy(childObject.GetComponent<Populate>());
-            var children = childObject.GetComponentsInChildren<ProceduralImage>();
-            foreach (var child in children)
-            {
-                child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
-            }
-            GameObject childObject2 = GameObject.Instantiate(GameObject.Find("P2")) as GameObject;
-            childObject2.transform.parent = GameObject.Find("RoundsSmall").transform;
-            childObject2.name = "P4";
-            childObject2.transform.localScale = new Vector3(1,1,1);
-            childObject2.transform.position = new Vector3(-33.8455f, 15.0724f, -95f);
-            childObject2.transform.localPosition = new Vector3(-79.3617f, -76.1387f, 0f);
-            GameObject.Destroy(childObject2.GetComponent<Populate>());
-            var children2 = childObject2.GetComponentsInChildren<ProceduralImage>();
-            foreach (var child in children2)
-            {
-                child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
-            }
+                GameObject childObject = Object.Instantiate(GameObject.Find("P1"));
+                childObject.transform.parent = GameObject.Find("RoundsSmall").transform;
+                childObject.name = "P3";
+                childObject.transform.localScale = new Vector3(1, 1, 1);
+                childObject.transform.position = new Vector3(-34.1654f, 16.2717f, -95f);
+                childObject.transform.localPosition = new Vector3(-79.3617f, -43.7602f, 0f);
+                GameObject.Destroy(childObject.GetComponent<Populate>());
+                var children = childObject.GetComponentsInChildren<ProceduralImage>();
+                foreach (var child in children)
+                {
+                    child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                }
+                GameObject childObject2 = Object.Instantiate(GameObject.Find("P2"));
+                childObject2.transform.parent = GameObject.Find("RoundsSmall").transform;
+                childObject2.name = "P4";
+                childObject2.transform.localScale = new Vector3(1, 1, 1);
+                childObject2.transform.position = new Vector3(-33.8455f, 15.0724f, -95f);
+                childObject2.transform.localPosition = new Vector3(-79.3617f, -76.1387f, 0f);
+                Object.Destroy(childObject2.GetComponent<Populate>());
+                var children2 = childObject2.GetComponentsInChildren<ProceduralImage>();
+                foreach (var child in children2)
+                {
+                    child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                }
             }
             var instance = PointVisualizer.instance;
             if (GM_ArmsRacePatch.winningTeamID == 2)
@@ -44,6 +44,7 @@ namespace FFAMod
                 if (GM_ArmsRacePatch.p3Points == 1)
                 {
                     instance.orangeFill.fillAmount = 0.5f;
+                    // var fillObject = GameObject.Instantiate(GameObject.Find(""));
                     HalfRed();
                     foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
                     {
@@ -59,9 +60,9 @@ namespace FFAMod
                 RoundRed();
                 foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
                 {
-                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f)&&child.GetComponent<ProceduralImage>().color != new Color(0.3387f, 0.3696f, 0.4057f))
+                    if (child.transform.localScale == new Vector3(0.3f, 0.3f, 0.3f) && child.GetComponent<ProceduralImage>().color != new Color(0.3387f, 0.3696f, 0.4057f))
                     {
-                        child.transform.localScale = new Vector3(1,1,1);
+                        child.transform.localScale = new Vector3(1, 1, 1);
                         break;
                     }
                 }
@@ -88,9 +89,9 @@ namespace FFAMod
                 RoundGreen();
                 foreach (var child in GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>())
                 {
-                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f)&&child.GetComponent<ProceduralImage>().color != new Color(0.3387f, 0.3696f, 0.4057f))
+                    if (child.transform.localScale == new Vector3(0.3f, 0.3f, 0.3f) && child.GetComponent<ProceduralImage>().color != new Color(0.3387f, 0.3696f, 0.4057f))
                     {
-                        child.transform.localScale = new Vector3(1,1,1);
+                        child.transform.localScale = new Vector3(1, 1, 1);
                         break;
                     }
                 }
