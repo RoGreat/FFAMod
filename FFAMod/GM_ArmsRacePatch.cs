@@ -45,6 +45,19 @@ namespace FFAMod
                     }
                     yield return null;
                 }
+            var children = GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>();
+            foreach (var child in children2)
+            {
+                child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+            }
+            var children2 = GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>();
+            foreach (var child in children2)
+            {
+                child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+            }
+            }
             }
             yield return null;
             UIHandler.instance.StopScreenTextLoop();
