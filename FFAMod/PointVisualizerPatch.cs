@@ -82,6 +82,7 @@ namespace FFAMod
                         if (child.GetComponent<ProceduralImage>().color == new Color(0.3387f, 0.3696f, 0.4057f))
                         {
                             child.GetComponent<ProceduralImage>().color = PlayerSkinBank.GetPlayerSkinColors(3).winText;
+                            break;
                         }
                     }
                     return;
