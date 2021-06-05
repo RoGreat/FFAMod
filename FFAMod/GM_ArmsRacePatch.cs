@@ -48,21 +48,20 @@ namespace FFAMod
                 }
                 for (int i=0;i<PlayerManager.instance.players.Count;i++)
                 {
-                PlayerManager.instance.players[i].data.currentCards.Clear();
+                    PlayerManager.instance.players[i].data.currentCards.Clear();
                 }
-            var children = GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>();
-            foreach (var child in children2)
-            {
-                child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
-                child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
-            }
-            var children2 = GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>();
-            foreach (var child in children2)
-            {
-                child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
-                child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
-            }
-            }
+                var children = GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>();
+                foreach (var child in children)
+                {
+                    child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                    child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+                }
+                var children2 = GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>();
+                foreach (var child in children2)
+                {
+                    child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                    child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+                }
             }
             yield return null;
             UIHandler.instance.StopScreenTextLoop();
@@ -240,12 +239,14 @@ namespace FFAMod
                 ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);  
             return false;
         }
+
         [PunRPC]
-        private static int loserteam(int loserteam1,int loserteam2)
+        private static void loserteam(int loserteam1, int loserteam2)
         {
-            losingTeamID2=loserteam1;
-                losingTeamID3=loserteam2;
+            losingTeamID2 = loserteam1;
+            losingTeamID3 = loserteam2;
         }
+
         private static IEnumerator WaitForSyncUp()
         {
             var instance = GM_ArmsRace.instance;
