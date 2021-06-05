@@ -45,6 +45,10 @@ namespace FFAMod
                     }
                     yield return null;
                 }
+                for (int i=0;i<PlayerManager.instance.players.Count;i++)
+                {
+                PlayerManager.instance.players[i].data.currentCards.Clear();
+                }
             var children = GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>();
             foreach (var child in children2)
             {
