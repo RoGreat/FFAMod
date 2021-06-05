@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UI.ProceduralImage;
 
 namespace FFAMod
 {
@@ -369,6 +370,23 @@ namespace FFAMod
             AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(instance, false);
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
+                {
+                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
+                    {
+                        child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                        break;
+                    }
+                }
+            foreach (var child in GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>())
+                {
+                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
+                    {
+                        child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+                        break;
+                    }
+                }
+
         }
 
         private static void PointOver(int winningTeamID)
