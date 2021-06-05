@@ -20,7 +20,8 @@ namespace FFAMod
         private static int pointsToWinRound;
         private static GameObject currentCard;
         private static int waitingForOtherPlayers;
-
+        private static int losingTeamID2;
+        private static int losingTeamID3;
         [HarmonyPatch("IDoRematch")]
         private static bool Prefix(ref IEnumerator __result, GM_ArmsRace __instance)
         {
@@ -234,9 +235,17 @@ namespace FFAMod
             TimeHandler.instance.DoSlowDown();
             instance.StartCoroutine(WaitForSyncUp());
             if (!PhotonNetwork.IsMasterClient)
-                ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);            return false;
+                ___view.RPC("loserteam", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 2), PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 3));
+                instance.StartCoroutine(WaitForSyncUp());
+                ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);  
+            return false;
         }
-
+        [PunRPC]
+        private static int loserteam(int loserteam1,int loserteam2)
+        {
+            losingTeamID2=loserteam1;
+                losingTeamID3=loserteam2;
+        }
         private static IEnumerator WaitForSyncUp()
         {
             var instance = GM_ArmsRace.instance;
@@ -244,24 +253,12 @@ namespace FFAMod
             yield return instance.StartCoroutine((IEnumerator)waitForSyncUp);
         }
 
-
+        
         [HarmonyPatch("RPCA_NextRound")]
         private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning, int ___pointsToWinRound)
         {
             var instance = GM_ArmsRace.instance;
-            int losingTeamID2 = -1;
-            int losingTeamID3 = -1;
             UnityEngine.Debug.Log("Losing team: " + losingTeamID);
-            if (PlayerManager.instance.players.Count >= 3)
-            {
-                losingTeamID2 = PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 2);
-                UnityEngine.Debug.Log("Losing team: " + losingTeamID2);
-            }
-            if (PlayerManager.instance.players.Count == 4)
-            {
-                losingTeamID3 = PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 3);
-                UnityEngine.Debug.Log("Losing team: " + losingTeamID3);
-            }
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
             pointsToWinRound = ___pointsToWinRound;
             UnityEngine.Debug.Log("Winning team: " + winningTeamID);
