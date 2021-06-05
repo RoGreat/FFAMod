@@ -240,9 +240,10 @@ namespace FFAMod
             TimeHandler.instance.DoSlowDown();
             instance.StartCoroutine(WaitForSyncUp());
             if (!PhotonNetwork.IsMasterClient)
-                ___view.RPC("loserteam", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 2), PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 3));
-                instance.StartCoroutine(WaitForSyncUp());
-                ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);  
+                return false;
+            ___view.RPC("loserteam", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 2), PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive(), 3));
+            instance.StartCoroutine(WaitForSyncUp());
+            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);  
             return false;
         }
 
