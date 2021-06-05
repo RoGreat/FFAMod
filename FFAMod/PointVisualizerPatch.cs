@@ -62,7 +62,7 @@ namespace FFAMod
                 RoundRed();
                 foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
                 {
-                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
+                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f)&&child.GetComponent<ProceduralImage>().color != new Color(0.3387f, 0.3696f, 0.4057f))
                     {
                         child.transform.localScale = new Vector3(1,1,1);
                         break;
@@ -91,7 +91,7 @@ namespace FFAMod
                 RoundGreen();
                 foreach (var child in GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>())
                 {
-                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
+                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f)&&child.GetComponent<ProceduralImage>().color != new Color(0.3387f, 0.3696f, 0.4057f))
                     {
                         child.transform.localScale = new Vector3(1,1,1);
                         break;
