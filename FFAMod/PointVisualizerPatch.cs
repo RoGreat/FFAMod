@@ -10,7 +10,7 @@ namespace FFAMod
         [HarmonyPatch("DoShowPoints")]
         private static void Postfix()
         {
-            if (GameObject.Find("P3") == null)
+            if (GameObject.Find("P3") == null&&PlayerManager.instance.players.Count >= 3)
             {
             GameObject childObject = GameObject.Instantiate(GameObject.Find("P1")) as GameObject;
             childObject.transform.parent = GameObject.Find("RoundsSmall").transform;
@@ -24,6 +24,8 @@ namespace FFAMod
             {
                 child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
             }
+            if (PlayerManager.instance.players.Count == 4)
+            {
             GameObject childObject2 = GameObject.Instantiate(GameObject.Find("P2")) as GameObject;
             childObject2.transform.parent = GameObject.Find("RoundsSmall").transform;
             childObject2.name = "P4";
@@ -35,6 +37,7 @@ namespace FFAMod
             foreach (var child in children2)
             {
                 child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
+            }
             }
             }
             var instance = PointVisualizer.instance;
