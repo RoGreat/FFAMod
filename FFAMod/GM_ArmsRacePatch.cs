@@ -231,7 +231,23 @@ namespace FFAMod
             instance.StartCoroutine(WaitForSyncUp());
             if (!PhotonNetwork.IsMasterClient)
                 return false;
-            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
+            		Player result = null;
+		for (int i = 0; i < PlayerManager.instance.players.Count; i++)
+		{
+			if (!PlayerManager.instance.players[i].data.dead)
+			{
+				result = PlayerManager.instance.players[i];
+				break;
+			}
+		}
+            int teamid=-1;
+            int teamd=-1;
+            if (result!=null)
+            {
+                teamid=PlayerManagerPatch.GetOtherTeam(result.teamid);
+                teamd=result.teamid;
+            }
+            ___view.RPC("RPCA_NextRound", RpcTarget.All, teamid, teamd, instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
             return false;
         }
 
