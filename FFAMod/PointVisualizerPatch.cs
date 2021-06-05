@@ -3,6 +3,7 @@ using Sonigon;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UI.ProceduralImage;
 
 namespace FFAMod
 {
