@@ -370,6 +370,8 @@ namespace FFAMod
             AccessTools.Field(typeof(GM_ArmsRace), "isTransitioning").SetValue(instance, false);
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
+            if (PlayerManager.instance.players.Count >= 3)
+            {
             foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
                 {
                     if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
@@ -378,6 +380,9 @@ namespace FFAMod
                         break;
                     }
                 }
+            }
+            if (PlayerManager.instance.players.Count == 4)
+            {
             foreach (var child in GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>())
                 {
                     if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
@@ -386,7 +391,7 @@ namespace FFAMod
                         break;
                     }
                 }
-
+            }
         }
 
         private static void PointOver(int winningTeamID)
