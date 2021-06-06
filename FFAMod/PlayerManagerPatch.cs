@@ -155,8 +155,8 @@ namespace FFAMod
             }
             else if (MapManager.instance.currentLevelID == 8)
             {
-                spawnPoints[0].localStartPos = new Vector3(23f, 9.6f);
-                spawnPoints[1].localStartPos = new Vector3(-23f, 9.6f);
+                spawnPoints[0].localStartPos = new Vector3(23f, -9.6f);
+                spawnPoints[1].localStartPos = new Vector3(-23f, -9.6f);
                 spawnPoints[2].localStartPos = new Vector3(18f, 7.4f);
                 spawnPoints[3].localStartPos = new Vector3(-18f, 7.4f);
             }
@@ -276,8 +276,8 @@ namespace FFAMod
             {
                 spawnPoints[0].localStartPos = new Vector3(-25f, 5f);
                 spawnPoints[1].localStartPos = new Vector3(25f, 5f);
-                spawnPoints[2].localStartPos = new Vector3(-15f, 5f);
-                spawnPoints[3].localStartPos = new Vector3(15f, 5f);
+                spawnPoints[2].localStartPos = new Vector3(-15f, -5f);
+                spawnPoints[3].localStartPos = new Vector3(15f, -5f);
             }
             else if (MapManager.instance.currentLevelID == 26)
             {
@@ -428,8 +428,8 @@ namespace FFAMod
             }
             else if (MapManager.instance.currentLevelID == 48)
             {
-                spawnPoints[0].localStartPos = new Vector3(-31f, 2.5f);
-                spawnPoints[1].localStartPos = new Vector3(31f, 2.5f);
+                spawnPoints[0].localStartPos = new Vector3(-33f, 13f);
+                spawnPoints[1].localStartPos = new Vector3(33f, 13f);
                 spawnPoints[2].localStartPos = new Vector3(-20f, 0f);
                 spawnPoints[3].localStartPos = new Vector3(20f, 0f);
             }
@@ -505,10 +505,10 @@ namespace FFAMod
             }
             else if (MapManager.instance.currentLevelID == 60)
             {
-                spawnPoints[0].localStartPos = new Vector3(-21.5f, 4f);
-                spawnPoints[1].localStartPos = new Vector3(21.5f, 4f);
-                spawnPoints[2].localStartPos = new Vector3(-21.5f, -3f);
-                spawnPoints[3].localStartPos = new Vector3(21.5f, -3f);
+                spawnPoints[0].localStartPos = new Vector3(-21.5f, 5f);
+                spawnPoints[1].localStartPos = new Vector3(21.5f, 5f);
+                spawnPoints[2].localStartPos = new Vector3(-21.5f, -2f);
+                spawnPoints[3].localStartPos = new Vector3(21.5f, -2f);
             }
             else if (MapManager.instance.currentLevelID == 61)
             {
