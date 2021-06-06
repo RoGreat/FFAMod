@@ -386,8 +386,8 @@ namespace FFAMod
             }
             else if (MapManager.instance.currentLevelID == 42)
             {
-                spawnPoints[0].localStartPos = new Vector3(-11.5f, -15f);
-                spawnPoints[1].localStartPos = new Vector3(11.5f, -15f);
+                spawnPoints[0].localStartPos = new Vector3(-11.5f, -14f);
+                spawnPoints[1].localStartPos = new Vector3(11.5f, -14f);
                 spawnPoints[2].localStartPos = new Vector3(-30f, 6f);
                 spawnPoints[3].localStartPos = new Vector3(30f, 6f);
             }
@@ -542,8 +542,8 @@ namespace FFAMod
             {
                 spawnPoints[0].localStartPos = new Vector3(-10f, 3f);
                 spawnPoints[1].localStartPos = new Vector3(10f, 3f);
-                spawnPoints[2].localStartPos = new Vector3(-10f, -8f);
-                spawnPoints[3].localStartPos = new Vector3(10f, -8f);
+                spawnPoints[2].localStartPos = new Vector3(-10f, -7f);
+                spawnPoints[3].localStartPos = new Vector3(10f, -7f);
             }
             else if (MapManager.instance.currentLevelID == 66)
             {
