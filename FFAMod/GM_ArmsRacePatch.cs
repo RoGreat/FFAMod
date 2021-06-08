@@ -20,8 +20,7 @@ namespace FFAMod
         private static int pointsToWinRound;
         private static GameObject currentCard;
         private static int waitingForOtherPlayers;
-        private static int losingTeamID2;
-        private static int losingTeamID3;
+
         [HarmonyPatch("IDoRematch")]
         private static bool Prefix(ref IEnumerator __result, GM_ArmsRace __instance)
         {
@@ -46,7 +45,7 @@ namespace FFAMod
                     }
                     yield return null;
                 }
-                for (int i=0;i<PlayerManager.instance.players.Count;i++)
+                for (int i = 0; i < PlayerManager.instance.players.Count; i++)
                 {
                     PlayerManager.instance.players[i].data.currentCards.Clear();
                 }
@@ -56,7 +55,7 @@ namespace FFAMod
                     foreach (var child in children)
                     {
                         child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
-                        child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+                        child.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
                     }
                 }
                 if (PlayerManager.instance.players.Count == 4)
@@ -65,7 +64,7 @@ namespace FFAMod
                     foreach (var child in children2)
                     {
                         child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
-                        child.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+                        child.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
                     }
                 }
             }
@@ -223,7 +222,7 @@ namespace FFAMod
             TimeHandler.instance.StartGame();
             GameManager.instance.battleOngoing = true;
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
-            
+
             // PlayerManager.instance.SetPlayersVisible(true);
             setPlayersVisible.Invoke(PlayerManager.instance, new object[] { true });
             yield break;
@@ -241,15 +240,8 @@ namespace FFAMod
             instance.StartCoroutine(WaitForSyncUp());
             if (!PhotonNetwork.IsMasterClient)
                 return false;
-            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);  
+            ___view.RPC("RPCA_NextRound", RpcTarget.All, PlayerManagerPatch.GetOtherTeam(PlayerManager.instance.GetLastTeamAlive()), PlayerManager.instance.GetLastTeamAlive(), instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds);
             return false;
-        }
-
-        [PunRPC]
-        private static void loserteam(int loserteam1, int loserteam2)
-        {
-            losingTeamID2 = loserteam1;
-            losingTeamID3 = loserteam2;
         }
 
         private static IEnumerator WaitForSyncUp()
@@ -259,7 +251,7 @@ namespace FFAMod
             yield return instance.StartCoroutine((IEnumerator)waitForSyncUp);
         }
 
-        
+
         [HarmonyPatch("RPCA_NextRound")]
         private static bool Prefix(int losingTeamID, int winningTeamID, int p1PointsSet, int p2PointsSet, int p1RoundsSet, int p2RoundsSet, ref bool ___isTransitioning, int ___pointsToWinRound)
         {
@@ -277,10 +269,6 @@ namespace FFAMod
             instance.p2Rounds = p2RoundsSet;
             ___isTransitioning = true;
             GameManager.instance.GameOver(winningTeamID, losingTeamID);
-            if (losingTeamID2 >= 0)
-                GameManager.instance.GameOver(winningTeamID, losingTeamID2);
-            if (losingTeamID3 >= 0)
-                GameManager.instance.GameOver(winningTeamID, losingTeamID3);
             PlayerManager.instance.SetPlayersSimulated(false);
             switch (winningTeamID)
             {
@@ -335,7 +323,7 @@ namespace FFAMod
             instance.p2Points = 0;
             p3Points = 0;
             p4Points = 0;
-            
+
         }
 
         private static IEnumerator RoundTransition(int winningTeamID)
@@ -345,7 +333,7 @@ namespace FFAMod
             var waitForSyncUp = AccessTools.Method(typeof(GM_ArmsRace), "WaitForSyncUp");
             GM_ArmsRacePatch.winningTeamID = winningTeamID;
             instance.StartCoroutine(PointVisualizer.instance.DoWinSequence(instance.p1Points, instance.p2Points, instance.p1Rounds, instance.p2Rounds, winningTeamID == 0));
-            
+
             yield return new WaitForSecondsRealtime(1f);
             MapManager.instance.LoadNextLevel();
             yield return new WaitForSecondsRealtime(0.3f);
@@ -390,9 +378,9 @@ namespace FFAMod
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
             if (PlayerManager.instance.players.Count >= 3)
             {
-            foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
+                foreach (var child in GameObject.Find("P3").GetComponentsInChildren<ProceduralImage>())
                 {
-                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
+                    if (child.transform.localScale == new Vector3(0.3f, 0.3f, 0.3f))
                     {
                         child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
                         break;
@@ -401,9 +389,9 @@ namespace FFAMod
             }
             if (PlayerManager.instance.players.Count == 4)
             {
-            foreach (var child in GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>())
+                foreach (var child in GameObject.Find("P4").GetComponentsInChildren<ProceduralImage>())
                 {
-                    if (child.transform.localScale == new Vector3(0.3f,0.3f,0.3f))
+                    if (child.transform.localScale == new Vector3(0.3f, 0.3f, 0.3f))
                     {
                         child.GetComponent<ProceduralImage>().color = new Color(0.3387f, 0.3696f, 0.4057f);
                         break;
@@ -426,7 +414,7 @@ namespace FFAMod
             // instance.StartCoroutine(PointTransition(winningTeamID, winTextBefore, winText));
             instance.StartCoroutine((IEnumerator)AccessTools.Method(typeof(GM_ArmsRace), "PointTransition").Invoke(instance, new object[] { winningTeamID, winTextBefore, winText }));
             UIHandler.instance.ShowRoundCounterSmall(instance.p1Rounds, instance.p2Rounds, instance.p1Points, instance.p2Points);
-            
+
         }
 
         private static IEnumerator AIPick(Player player)
@@ -443,7 +431,6 @@ namespace FFAMod
             // -- Pick
             CardChoice.instance.Pick(null);
             yield return new WaitForSecondsRealtime(1f);
-
             // -- Update
             // -- DoPlayerSelect
             SoundMusicManager.Instance.PlayIngame(true);
@@ -456,18 +443,18 @@ namespace FFAMod
             currentCard.GetComponentInChildren<GraphicRaycaster>().enabled = false;
             currentCard.GetComponentInChildren<SetScaleToZero>().enabled = false;
             currentCard.GetComponentInChildren<SetScaleToZero>().transform.localScale = Vector3.one * 1.15f;
-            // - ApplyCardStats
             currentCard.transform.root.GetComponentInChildren<ApplyCardStats>().Pick(CardChoice.instance.pickrID, true);
             yield return new WaitForSecondsRealtime(1f);
-            // - CardChoice
-            // -- IDoEndPick
+            // - ApplyCardStats
             CardChoice.instance.StartCoroutine(CardChoice.instance.IDoEndPick(currentCard, 0, CardChoice.instance.pickrID));
-            CardChoice.instance.pickrID = -1;
-            UIHandler.instance.StopShowPicker();
-            CardChoiceVisuals.instance.Hide();
             yield return new WaitForSecondsRealtime(0.3f);
             Object.Destroy(currentCard);
             yield return new WaitForSecondsRealtime(0.3f);
+            // - CardChoice
+            // -- IDoEndPick
+            CardChoice.instance.pickrID = -1;
+            UIHandler.instance.StopShowPicker();
+            CardChoiceVisuals.instance.Hide();
             for (int i = 0; i < spawnedCards.Count; i++)
                 Object.Destroy(spawnedCards[i]);
             yield break;

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace FFAMod
 {
-    [BepInPlugin("plugin.bepinex.mod.rounds.all.for.free", "Free For All Mod", "0.7.0.0")]
+    [BepInPlugin("plugin.bepinex.mod.rounds.all.for.free", "Free For All Mod", "0.8.0.0")]
     [BepInProcess("Rounds.exe")]
     public class FFAPlugin : BaseUnityPlugin
     {
