@@ -1,5 +1,7 @@
 # FFAMod
-ROUNDS mod that makes the game a free-for-all for offline and online play. Can play with up to 4 people.
+ROUNDS mod that makes the game a free-for-all for offline with bots and online play. Can play with up to 4 people.
+
+Check out https://github.com/olavim/RoundsWithFriends which now has a free for all mode.
 
 Everyone must use this mod with the BepInEx modloader dependency adapted to ROUNDS by Willis in order for it to work.
 Put the FFAMod.dll into the ...\ROUNDS\BepInEx\plugins folder.
