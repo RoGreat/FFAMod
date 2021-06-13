@@ -200,6 +200,17 @@ namespace FFAMod
             setPlayersVisible.Invoke(PlayerManager.instance, new object[] { false });
             MapManager.instance.LoadNextLevel();
             TimeHandler.instance.DoSpeedUp();
+                        for (int d=0;d<PlayerManager.instance.players.Count;d++)
+            {
+            for (int i=0;i<PlayerManager.instance.players.Count;i++)
+            {
+                if (PlayerManager.instance.players[d].playerID == PlayerManager.instance.players[i].playerID)
+                {
+                    NetworkConnectionHandler.instance.NetworkRestart();
+                }
+            }
+            }
+
             yield return new WaitForSecondsRealtime(1f);
             if (instance.pickPhase)
             {
